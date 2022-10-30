@@ -28,23 +28,47 @@ router.post('/users/register', async (req, res) => {
 router.post('/users/login', async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username, password });
+  new Promise(async (resolve, reject) => {
+    await User.findOne({ username }, function (err, user) {
+      if (err) throw err;
+      if (!user) {
+        return reject("user not found.");
+      }
 
-  if (found_user) {
+      user.comparePassword(password, function(err, isMatch) {
+          if (err) throw err;
+
+          if (user) {
+            delete user.password
+          }
+
+          return resolve(user)
+      });
+    }).clone();
+  }).then((user) => {
+    if (user) {
+      return res.send({
+        status: 200,
+        ok: true,
+        message: "The user successfully finded.",
+        data: user
+      });
+    } else {
+      return {
+        status: 404,
+        ok: false,
+        message: "The user is not registered.",
+        data: {}
+      }
+    }
+  }).catch((err) => {
     return res.send({
-      status: 200,
-      ok: true,
-      message: "The user successfully finded.",
-      data: user
-    });
-  }
+      status: 400,
+      ok: false,
+      error: err,
+    })
+  })
 
-  return {
-    status: 404,
-    ok: false,
-    message: "The user is not registered.",
-    data: {}
-  }
 })
 
 router.get('/users', async (_, res) => {
