@@ -29,7 +29,7 @@ const UserSchema = new Schema({
   },
 })
 
-UserSchema.pre('save', function(next) {
+function  hashPassword(next) {
   var user = this;
 
   // only hash the password if it has been modified (or is new)
@@ -48,13 +48,17 @@ UserSchema.pre('save', function(next) {
           next();
       });
   });
-});
-   
+}
+
+UserSchema.pre('save', hashPassword);
+UserSchema.pre('update', hashPassword)
+
 UserSchema.methods.comparePassword = function(candidatePassword, cb) {
   bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
       if (err) return cb(err);
       cb(null, isMatch);
   });
 };
+
 
 export default mongoose.model("Users", UserSchema)

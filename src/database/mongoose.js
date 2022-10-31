@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-
+import { database } from "../../config.js";
 
 export async function mongooseConnect() {
   try {
     const DB = mongoose.connection;
-    const url = 'mongodb+srv://blvckeasy:islom1029@cluster0.7gt88f2.mongodb.net/chatapp';
+    const url = database.url;
     const config = {
       useNewUrlParser: true,
     };
@@ -19,4 +19,4 @@ export async function mongooseConnect() {
   } catch (error) {
     throw new Error(error);
   }
-}
+} 

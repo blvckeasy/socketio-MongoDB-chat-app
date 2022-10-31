@@ -12,3 +12,7 @@ export const cors = {
   allow_methods: process.env.ALLOW_METHODS || "OPTIONS, GET, POST, PUT, DELETE",
   request_method: process.env.REQUEST_METHOD || "*",
 };
+
+export const database = {
+  url: process.env.DB_URL
+}
