@@ -19,4 +19,4 @@ export async function mongooseConnect() {
   } catch (error) {
     throw new Error(error);
   }
-} 
+}
