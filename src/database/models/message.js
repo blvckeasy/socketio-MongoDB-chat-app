@@ -8,7 +8,12 @@ const MessageSchema = new Schema({
     default: UUID.v4(),
   },
 
-  user_id: {
+  from_user_id: {
+    type: Types.ObjectId,
+    ref: "Users"
+  },
+
+  to_user_id: {
     type: Types.ObjectId,
     ref: "Users"
   },
@@ -18,6 +23,11 @@ const MessageSchema = new Schema({
     min: 1,
     max: 500
   },
+
+  sended_time: {
+    type: Date,
+    default: +new Date() + 7 * 24 * 60 * 60 * 1000,
+  }
 })
 
 

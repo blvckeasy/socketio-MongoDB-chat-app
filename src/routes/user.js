@@ -49,13 +49,23 @@ router.post('/users/register', async (req, res) => {
   const found_user = await User.findOne({ username })
   
   if (!found_user) {
-    const user = await User.create({ username, password })
-    return res.send({
-      status: 200,
-      ok: true,
-      message: "user successfully registered.",
-      data: user
-    });
+    try {
+      const user = await User.create({ username, password })
+      return res.send({
+        status: 200,
+        ok: true,
+        message: "user successfully registered.",
+        data: user
+      });
+    } catch (error) {
+      console.log(error);
+      return res.send({
+        status: 400,
+        ok: false,
+        error,
+        data: {}
+      })  
+    }
   }
 
   return res.send({
@@ -65,14 +75,6 @@ router.post('/users/register', async (req, res) => {
     user: {}
   })
 });
-
-function checkPassword(user, password) {
-  user.comparePassword(password, function (err, isMatch) {
-    if (err) throw err;
-
-    return isMatch
-  })
-}
 
 router.post('/users/login', async (req, res) => {
   const { username, password } = req.body;
@@ -122,13 +124,6 @@ router.post('/users/login', async (req, res) => {
   })
 
 })
-
-function compare (candidatePassword, password, cb) {
-  bcrypt.compare(candidatePassword, password, function(err, isMatch) {
-      if (err) return cb(err);
-      cb(null, isMatch);
-  });
-}
 
 router.patch('/users/:id', async (req, res) => {
   const { id } = req.params
@@ -182,7 +177,35 @@ router.patch('/users/:id', async (req, res) => {
       error: err,
     })
   })  
+})
 
+router.delete('/users/:id', async (req, res) => {
+  const { id } = req.params
+
+  const user = await User.findOne({ _id: id }).clone()
+  
+  if (!id) return res.send({
+    status: 400,
+    ok: false,
+    message: "id is require!"
+  })
+
+  if (!user) return res.send({
+    status: 403,
+    ok: false,
+    error: { message: "user not found!" }
+  })
+
+  
+  const deleted_user = await User.findOneAndDelete({ _id: id });
+  deleted_user.password = undefined
+
+  return res.send({
+    status: 201,
+    ok: true,
+    message: "user successfully deleted!",
+    data: deleted_user,
+  })
 })
 
 

@@ -1,4 +1,8 @@
 import Dotenv from 'dotenv';
+import Fs from 'fs'
+import Path from 'path'
+import { getCurrentDate } from './src/helpers/date.js'
+
 Dotenv.config();
 
 export const server = {
@@ -16,3 +20,8 @@ export const cors = {
 export const database = {
   url: process.env.DB_URL
 }
+
+export const logger = {
+  accessLogStream: Fs.createWriteStream(Path.join(process.cwd(), 'src', 'logs', `${getCurrentDate()}.log`))
+}
+   

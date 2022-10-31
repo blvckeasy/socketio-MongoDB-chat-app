@@ -1,6 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
 import UUID from 'node-uuid'
-import bcrypt, { hash } from 'bcrypt'
+import bcrypt from 'bcrypt'
 
 
 const SALT_WORK_FACTOR = 10;
@@ -8,7 +8,7 @@ const SALT_WORK_FACTOR = 10;
 const UserSchema = new Schema({
   _id: {
     type: String,
-    default: UUID.v4(),
+    default: UUID.v1,
   },
   
   username: {
