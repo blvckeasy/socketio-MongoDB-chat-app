@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 export async function mongooseConnect() {
   try {
     const DB = mongoose.connection;
-    const url = 'mongodb+srv://blvckeasy:islom1029@cluster0.7gt88f2.mongodb.net/chatapp';
+    const url = '#';
     const config = {
       useNewUrlParser: true,
     };
