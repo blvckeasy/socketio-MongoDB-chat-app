@@ -39,5 +39,20 @@ export default class MessageController {
     });
   }
 
-  
+  async editMessage(req, res) {
+    const { id } = req.params;
+    const { message } = req.body;
+
+    const updated_message = await this.Message.findOneAndUpdate({ _id: id }, { message });
+
+    return res.send(updated_message);
+  }
+
+  async deleteMessage(req, res) {
+    const { id } = req.params;
+
+    const deleted_message = await this.Message.findOneAndDelete({ _id: id });
+
+    return res.send(deleted_message);
+  }
 }

@@ -8,7 +8,9 @@ const router = Router();
 const messageController = new MessageController(Message, User)
 
 router.get("/messages", (req, res) => messageController.getMessages(req, res));
-router.post("/messages", (req, res) => messageController.postMessage(req, res));
+router.post("/messages/new", (req, res) => messageController.postMessage(req, res));
+router.patch("/message/edit/:id", (req, res) => messageController.editMessage(req, res));
+router.delete("/message/delete/:id")
 
 
 export default router
