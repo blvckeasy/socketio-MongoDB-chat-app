@@ -5,16 +5,16 @@ import UUID from "node-uuid";
 const MessageSchema = new Schema({
   _id: {
     type: String,
-    default: UUID.v4(),
+    default: UUID.v1,
   },
 
   from_user_id: {
-    type: Types.ObjectId,
+    type: String,
     ref: "Users"
   },
 
   to_user_id: {
-    type: Types.ObjectId,
+    type: String,
     ref: "Users"
   },
 

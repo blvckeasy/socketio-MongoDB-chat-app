@@ -1,2 +1,0 @@
-::1 - - [01/Nov/2022:20:43:38 +0000] "GET /users/ HTTP/1.1" 200 498 "-" "PostmanRuntime/7.29.2"
-::1 - - [01/Nov/2022:20:43:48 +0000] "GET /users/b37d3377-60fb-4b1b-a269-3245a3833e18 HTTP/1.1" 200 130 "-" "PostmanRuntime/7.29.2"

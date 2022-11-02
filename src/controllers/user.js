@@ -11,7 +11,6 @@ class CustomError extends Error {
 export default class UsersController {
   constructor(UserRepository) {
     this.User = UserRepository;
-    this.number = 5;
   }
 
   async getUsers(_, res) {
@@ -99,7 +98,7 @@ export default class UsersController {
 
   async register(req, res) {
     const { username, password } = req.body;
-    if (!(username && password)) return res.send(UnAuthorizationError(res));
+    if (!(username && password)) return res.send(CustomError.UnAuthorizationError());
 
     const found_user = await this.User.findOne({ username })
     

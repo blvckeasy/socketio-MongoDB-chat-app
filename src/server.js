@@ -4,7 +4,8 @@ import { Server as Socket } from 'socket.io'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import { mongooseConnect } from './database/mongoose.js';
-import todoRoutes from './routes/user.js'
+import userRoutes from './routes/user.js'
+import messageRoutes from './routes/message.js'
 import { logger } from '../config.js'
 
 async function bootstrap() {
@@ -25,7 +26,8 @@ async function bootstrap() {
     stream: logger.accessLogStream
   }))
   app.use(Express.json())
-  app.use(todoRoutes);
+  app.use(userRoutes);
+  app.use(messageRoutes)
 
   // connect to mongoose
   mongooseConnect();
@@ -48,7 +50,7 @@ async function bootstrap() {
     })
 
     socket.on("disconnect", () => {
-      // console.log("disconnect -->")
+      console.log("disconnect -->")
     })
   })
 
