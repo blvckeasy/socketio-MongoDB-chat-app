@@ -1,12 +1,4 @@
-class CustomError extends Error {
-  static UnAuthorizationError() {
-    return {
-      status: 400,
-      ok: false,
-      message: "username or password invalid",
-    }
-  }
-}
+
 
 export default class UsersController {
   constructor(UserRepository) {
@@ -104,7 +96,7 @@ export default class UsersController {
     
     if (!found_user) {
       try {
-        const user = await User.create({ username, password })
+        const user = await this.User.create({ username, password })
         return res.send({
           status: 200,
           ok: true,

@@ -7,6 +7,8 @@ import { mongooseConnect } from './database/mongoose.js';
 import userRoutes from './routes/user.js'
 import messageRoutes from './routes/message.js'
 import { logger } from '../config.js'
+import * as Errors from './helpers/error.js'
+
 
 async function bootstrap() {
   const HOST = "localhost";
@@ -54,6 +56,26 @@ async function bootstrap() {
     })
   })
 
+  app.use((err, req, res, next) => {
+    const ALL_CUSTOM_ERROR_NAMES = Object.keys(Errors);
+
+    for (const error in Errors) {
+      if (err instanceof Errors[error]) {
+          return res.send({
+            status: 500,
+            ok: false,
+            error: err,
+          }).status(500)
+      }
+    }
+
+    console.log("internal server error", err);
+
+    return res.send({
+      ok: false,
+      message: "internal server error",
+    }).status(505)
+  })
 
   server.listen(PORT, () => {
     console.log(`server running on http://${HOST}:${PORT}/`)
