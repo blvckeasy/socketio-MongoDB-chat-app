@@ -99,7 +99,6 @@ export default class MessageController {
         })
       })
       
-      
       if (error) return next(new MongooseInvalidDataError(error))
   
       return res.status(200).send({

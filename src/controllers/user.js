@@ -1,3 +1,5 @@
+import { MongooseInvalidDataError, UnAuthorizationError } from "../helpers/error";
+
 export default class UsersController {
   constructor(UserRepository) {
     this.User = UserRepository;
@@ -49,7 +51,7 @@ export default class UsersController {
   async login(req, res) {
     try {
       const { username, password } = req.body;
-      if (!(username && password)) return res.send(CustomError.UnAuthorizationError());
+      if (!(username && password)) return res.send(new UnAuthorizationError("username and password is require!"));
       
       new Promise(async (resolve, reject) => {
         await this.User.findOne({ username }, function (err, user) {
@@ -64,7 +66,7 @@ export default class UsersController {
               if (isMatch) {
                 return resolve(user)
               }
-              return reject(CustomError.UnAuthorizationError())
+              return reject(new UnAuthorizationError("invalid password"))
           });
         }).clone();
       }).then(async (user) => {
@@ -86,7 +88,6 @@ export default class UsersController {
           }
         }
       }).catch((err) => {
-        console.log('err', err)
         return res.send({
           status: 400,
           ok: false,
@@ -101,7 +102,7 @@ export default class UsersController {
   async register(req, res) {
     try {
       const { username, password } = req.body;
-      if (!(username && password)) return res.send(CustomError.UnAuthorizationError());
+      if (!(username && password)) return res.send(new UnAuthorizationError("username and password is require!"));
   
       const found_user = await this.User.findOne({ username })
       
@@ -115,7 +116,6 @@ export default class UsersController {
             data: user
           });
         } catch (error) {
-          console.log(error);
           return res.send({
             status: 400,
             ok: false,
@@ -196,7 +196,6 @@ export default class UsersController {
   async delete(req, res) {
     try {
       const { id } = req.params
-
       const user = await this.User.findOne({ _id: id }).clone()
       
       if (!id) return res.send({
@@ -210,7 +209,6 @@ export default class UsersController {
         ok: false,
         error: { message: "user not found!" }
       })
-    
       
       const deleted_user = await this.User.findOneAndDelete({ _id: id });
       deleted_user.password = undefined
