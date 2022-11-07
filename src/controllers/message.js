@@ -1,5 +1,4 @@
 import {
-  CustomError,
   MongooseInvalidDataError,
   UnAuthorizationError,
 } from '../helpers/error.js'

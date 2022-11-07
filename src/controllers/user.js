@@ -1,4 +1,4 @@
-import { MongooseInvalidDataError, UnAuthorizationError } from "../helpers/error";
+import { MongooseInvalidDataError, UnAuthorizationError } from "../helpers/error.js";
 
 export default class UsersController {
   constructor(UserRepository) {
