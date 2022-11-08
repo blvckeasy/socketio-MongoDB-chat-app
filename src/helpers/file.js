@@ -39,7 +39,7 @@ export async function ReadFile(path) {
 
 export async function AppendErrorToFile(filename, error) {
   try {
-    const error_file_path = Path.join(process.cwd(), 'src', 'logs', 'errors');
+    const error_file_path = Path.join(process.cwd(), 'src', 'logs', 'errors', filename);
 
     await Fs.appendFile(error_file_path, error + '\n', {
       encoding: "utf-8",
