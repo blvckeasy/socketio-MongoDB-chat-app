@@ -61,18 +61,19 @@ async function bootstrap() {
     try {
       for (const error in Errors) {
         if (err instanceof Errors[error]) {
-            return res.send({
-              status: 500,
+            return res.status(400).send({
               ok: false,
               error: err,
-            }).status(500)
+            })
         }
       }
   
+      console.log('headers', req.headers);
+
       const info = {
         method: req.method,
         url: req.url,
-        ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+        ip: req?.headers['x-forwarded-for'] || req.socket.remoteAddress,
         date: new Date(),
       }
   
@@ -82,15 +83,13 @@ async function bootstrap() {
       }
       
       AppendErrorToFile(error);
-      throw new Error(2);
     } catch (error) {
       console.error(error);
-    } finally {
-      return res.send({
-        ok: false,
-        message: "internal server error",
-      }).status(505)
     }
+    return res.send({
+      ok: false,
+      message: "internal server error",
+    }).status(505)
   })
 
   server.listen(PORT, () => {

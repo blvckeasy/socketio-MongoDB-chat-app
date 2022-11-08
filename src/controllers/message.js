@@ -94,12 +94,12 @@ export default class MessageController {
       const { id } = req.params
       const { error, data: deleted_message } = await new Promise((resolve) => {
         this.Message.findOneAndDelete({ _id: id }, function (err, data) {
-          return resolve({error: err, data});
+          return resolve({error: 1, data: data || {}});
         })
       })
-
+      
       if (error) return next(new MongooseInvalidDataError(error))
-  
+      
       return res.status(200).send({
         ok: true,
         message: 'message successfully deleted.',
