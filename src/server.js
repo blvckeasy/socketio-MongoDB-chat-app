@@ -25,8 +25,8 @@ async function bootstrap() {
   
   app.use(helmet())
   // logger
-  app.use(morgan('combined', {
-    stream: logger.accessLogStream
+  app.use(morgan(logger.type, {
+    stream: logger.accessLogStream,
   }))
   app.use(Express.json())
   app.use(userRoutes);

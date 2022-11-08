@@ -22,5 +22,6 @@ export const database = {
 }
 
 export const logger = {
-  accessLogStream: Fs.createWriteStream(Path.join(process.cwd(), 'src', 'logs', 'requests', `${getCurrentDate()}.log`))
+  type: 'combined',
+  accessLogStream: Fs.createWriteStream(Path.join(process.cwd(), 'src', 'logs', 'requests', `${getCurrentDate()}.log`), { flags: "a" })
 }
