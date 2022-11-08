@@ -1,5 +1,6 @@
 import Fs from 'fs/promises';
 import Path from 'path';
+import { getCurrentDate } from './date.js';
 
 export async function CreateOrAppendFile (path, data) {
   try {
@@ -37,15 +38,15 @@ export async function ReadFile(path) {
   }
 }
 
-export async function AppendErrorToFile(filename, error) {
+export async function AppendErrorToFile(error, filename = getCurrentDate()) {
   try {
-    const error_file_path = Path.join(process.cwd(), 'src', 'logs', 'errors', filename);
+    const error_file_path = Path.join(process.cwd(), 'src', 'logs', 'errors', filename + '.log');
 
-    await Fs.appendFile(error_file_path, error + '\n', {
+    await Fs.appendFile(error_file_path, JSON.stringify(error, null, 4) + '\n', {
       encoding: "utf-8",
     })
 
-    return data;
+    return error;
   } catch (error) {
     throw new Error(error);
   }

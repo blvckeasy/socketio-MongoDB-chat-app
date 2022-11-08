@@ -92,12 +92,12 @@ export default class MessageController {
   async deleteMessage(req, res, next) {
     try {
       const { id } = req.params
-      let { error, data: deleted_message } = await new Promise((resolve) => {
+      const { error, data: deleted_message } = await new Promise((resolve) => {
         this.Message.findOneAndDelete({ _id: id }, function (err, data) {
           return resolve({error: err, data});
         })
       })
-      
+
       if (error) return next(new MongooseInvalidDataError(error))
   
       return res.status(200).send({

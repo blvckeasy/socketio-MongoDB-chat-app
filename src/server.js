@@ -8,6 +8,7 @@ import userRoutes from './routes/user.js'
 import messageRoutes from './routes/message.js'
 import { logger } from '../config.js'
 import * as Errors from './helpers/error.js'
+import { AppendErrorToFile } from './helpers/file.js'
 
 
 async function bootstrap() {
@@ -57,30 +58,44 @@ async function bootstrap() {
   })
 
   app.use((err, req, res, next) => {
-    const ALL_CUSTOM_ERROR_NAMES = Object.keys(Errors);
-
-    for (const error in Errors) {
-      if (err instanceof Errors[error]) {
-          return res.send({
-            status: 500,
-            ok: false,
-            error: err,
-          }).status(500)
+    try {
+      for (const error in Errors) {
+        if (err instanceof Errors[error]) {
+            return res.send({
+              status: 500,
+              ok: false,
+              error: err,
+            }).status(500)
+        }
       }
+  
+      const info = {
+        method: req.method,
+        url: req.url,
+        ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+        date: new Date(),
+      }
+  
+      const error = {
+        error: err,
+        info,
+      }
+      
+      AppendErrorToFile(error);
+      throw new Error(2);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      return res.send({
+        ok: false,
+        message: "internal server error",
+      }).status(505)
     }
-
-    console.log("internal server error", err);
-
-    return res.send({
-      ok: false,
-      message: "internal server error",
-    }).status(505)
   })
 
   server.listen(PORT, () => {
     console.log(`server running on http://${HOST}:${PORT}/`)
   })
-
 }
 
 bootstrap();
