@@ -40,18 +40,22 @@ async function bootstrap() {
   })
 
   io.use((socket, next) => {
-    const key = socket.handshake;
+    const key = socket.handshake.auth.token || socket.handshake.headers.token;
+    if (!token) {
+      return socket.emit("error", );
+    } 
     console.log(key)
     next();
   })
 
   io.on('connection', socket => {
     console.log('connect')
-    socket.on("message", (data) => {
-      console.log('ok')
-      socket.emit("get", "hello world");
+    socket.on("islom", (data) => {
+      console.log("islom", data);
+      return socket.emit("keldi", data);
     })
-
+    
+    
     socket.on("disconnect", () => {
       console.log("disconnect -->")
     })
@@ -68,18 +72,14 @@ async function bootstrap() {
         }
       }
   
-      console.log('headers', req.headers);
-
-      const info = {
-        method: req.method,
-        url: req.url,
-        ip: req?.headers['x-forwarded-for'] || req.socket.remoteAddress,
-        date: new Date(),
-      }
-  
       const error = {
         error: err,
-        info,
+        info: {
+          method: req.method,
+          url: req.url,
+          ip: req?.headers['x-forwarded-for'] || req.socket.remoteAddress,
+          date: new Date(),
+        },
       }
       
       AppendErrorToFile(error);

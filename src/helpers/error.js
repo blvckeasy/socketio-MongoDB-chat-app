@@ -21,3 +21,11 @@ export class UnAuthorizationError extends Error {
     this.status = status;
   }
 }
+
+export class AuthenticationError extends Error {
+  constructor (error, status = 401) {
+    super();
+    this.error = error;
+    this.status = status;
+  } 
+}0
