@@ -1,7 +1,7 @@
 import Dotenv from 'dotenv';
 import Fs from 'fs'
 import Path from 'path'
-import { getCurrentDate } from './src/helpers/date.js'
+import { getCurrentDate } from './src/api/helpers/date.js'
 
 Dotenv.config();
 
@@ -23,7 +23,7 @@ export const database = {
 
 export const logger = {
   type: 'combined',
-  accessLogStream: Fs.createWriteStream(Path.join(process.cwd(), 'src', 'logs', 'requests', `${getCurrentDate()}.log`), { flags: "a" })
+  accessLogStream: Fs.createWriteStream(Path.join(process.cwd(), 'src', 'api', 'logs', 'requests', `${getCurrentDate()}.log`), { flags: "a" })
 }
 
 export const JWT = {

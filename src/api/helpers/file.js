@@ -40,7 +40,7 @@ export async function ReadFile(path) {
 
 export async function AppendErrorToFile(error, filename = getCurrentDate()) {
   try {
-    const error_file_path = Path.join(process.cwd(), 'src', 'logs', 'errors', filename + '.log');
+    const error_file_path = Path.join(process.cwd(), 'src', 'api', 'logs', 'errors', filename + '.log');
 
     await Fs.appendFile(error_file_path, JSON.stringify(error, null, 4) + '\n', {
       encoding: "utf-8",

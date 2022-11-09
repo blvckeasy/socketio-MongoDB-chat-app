@@ -3,12 +3,13 @@ import Express from 'express'
 import { Server as Socket } from 'socket.io'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { mongooseConnect } from './database/mongoose.js';
-import userRoutes from './routes/user.js'
-import messageRoutes from './routes/message.js'
-import { logger } from '../config.js'
-import * as Errors from './helpers/error.js'
-import { AppendErrorToFile } from './helpers/file.js'
+import { mongooseConnect } from './api/database/mongoose.js';
+import userRoutes from './api/routes/user.js'
+import messageRoutes from './api/routes/message.js'
+import { JWT, logger } from '../config.js'
+import * as Errors from './api/helpers/error.js'
+import { AppendErrorToFile } from './api/helpers/file.js'
+import { verifyToken } from './api/helpers/jwt.js'
 
 
 async function bootstrap() {
@@ -39,12 +40,20 @@ async function bootstrap() {
     return res.send('hello')
   })
 
-  io.use((socket, next) => {
-    const key = socket.handshake.auth.token || socket.handshake.headers.token;
-    if (!token) {
-      return socket.emit("error", );
-    } 
-    console.log(key)
+  io.use(async (socket, next) => {
+    try {
+      const token = socket.handshake.auth.token || socket.handshake.headers.token;
+      if (!token) {
+        throw new Errors.AuthenticationError("invalid token")
+      }
+
+      const user = verifyToken(token);
+      // const found_user =
+
+    } catch (error) {
+      next(error); 
+    }
+
     next();
   })
 

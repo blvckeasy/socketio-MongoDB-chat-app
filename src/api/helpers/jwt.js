@@ -1,5 +1,5 @@
 import JWT from "jsonwebtoken";
-import { JWT as jwt_config } from "../../config.js";
+import { JWT as jwt_config } from "../../../config.js";
 import { AuthenticationError } from "./error.js";
 
 export function signToken (payload) {
