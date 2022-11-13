@@ -43,9 +43,10 @@ export default class UsersService {
     }
   }
 
-  async createUser(username, password) {
+  async createUser(params) {
     try {
-      const user = await this.UserRepository.create({ username, password });
+      const user = await this.UserRepository.create(params);
+      user.password = undefined
       return user;
     } catch (error) {
       throw error;
@@ -58,7 +59,18 @@ export default class UsersService {
       await this.UserRepository.findOneAndUpdate({ _id }, params);
       
       const updated_user = await this.UserRepository.findOne({ _id });
+      updated_user.password = undefined;
       return updated_user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteUser(params) {
+    try {
+      const deleted_user = await this.UserRepository.findOneAndDelete(params);
+      deleted_user.password = undefined 
+      return deleted_user;
     } catch (error) {
       throw error;
     }

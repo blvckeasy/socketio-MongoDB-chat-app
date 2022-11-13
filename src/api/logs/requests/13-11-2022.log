@@ -12,3 +12,6 @@
 ::1 - - [13/Nov/2022:06:58:59 +0000] "PATCH /users/33076f70-62a3-11ed-8bca-6fc16f477fec HTTP/1.1" 201 212 "-" "PostmanRuntime/7.29.2"
 ::1 - - [13/Nov/2022:07:16:00 +0000] "GET /users HTTP/1.1" 200 286 "-" "PostmanRuntime/7.29.2"
 ::1 - - [13/Nov/2022:07:16:11 +0000] "PATCH /users/33076f70-62a3-11ed-8bca-6fc16f477fec HTTP/1.1" 400 74 "-" "PostmanRuntime/7.29.2"
+::1 - - [13/Nov/2022:07:23:42 +0000] "DELETE /users/33076f70-62a3-11ed-8bca-6fc16f477feca HTTP/1.1" 400 66 "-" "PostmanRuntime/7.29.2"
+::1 - - [13/Nov/2022:07:23:47 +0000] "DELETE /users/33076f70-62a3-11ed-8bca-6fc16f477fec HTTP/1.1" 200 151 "-" "PostmanRuntime/7.29.2"
+::1 - - [13/Nov/2022:07:23:54 +0000] "GET /users HTTP/1.1" 200 205 "-" "PostmanRuntime/7.29.2"

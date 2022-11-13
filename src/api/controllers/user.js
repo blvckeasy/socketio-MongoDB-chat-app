@@ -79,7 +79,7 @@ export default class UsersController {
       const found_user = await this.userService.getUser({ username });
       if (found_user) throw new UnAuthorizationError("user already signin!");
 
-      const user = await this.userService.createUser(username, password);
+      const user = await this.userService.createUser({ username, password });
       return res.send({
         status: 200,
         ok: true,
@@ -130,22 +130,12 @@ export default class UsersController {
   async delete(req, res, next) {
     try {
       const { id } = req.params
-      const user = await this.UserRepository.findOne({ _id: id }).clone()
+      const user = await this.userService.getUser({ _id: id });
       
-      if (!id) return res.send({
-        status: 400,
-        ok: false,
-        message: "id is require!"
-      })
-    
-      if (!user) return res.send({
-        status: 403,
-        ok: false,
-        error: { message: "user not found!" }
-      })
+      if (!id) throw new BadGatewayError("id is require!");
+      if (!user) throw new UnAuthorizationError("user is not defined!");
       
-      const deleted_user = await this.UserRepository.findOneAndDelete({ _id: id });
-      deleted_user.password = undefined
+      const deleted_user = await this.userService.deleteUser({ _id: id });
     
       return res.send({
         status: 201,
@@ -156,10 +146,5 @@ export default class UsersController {
     } catch (error) {
       next(error);
     }
-  }
-
-  async deleteAll() {
-    const deleted_users = await this.UserRepository.deleteMany();
-    return res.send(deleted_users);
   }
 }

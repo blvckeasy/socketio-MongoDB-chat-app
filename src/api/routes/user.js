@@ -10,7 +10,6 @@ router.get('/users/:id', (req, res, next) => userController.getUser(req, res, ne
 router.post('/users/register', (req, res, next) => userController.register(req, res, next));
 router.post('/users/login', (req, res, next) => userController.login(req, res, next));
 router.patch('/users/:id', (req, res, next) => userController.update(req, res, next))
-router.delete("/users/all", (req, res) => userController.deleteAll(req, res));
 router.delete('/users/:id', (req, res, next) => userController.delete(req, res, next))
 
 
