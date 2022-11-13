@@ -7,7 +7,7 @@ export class InternalServerError extends Error {
 }
 
 export class MongooseInvalidDataError extends Error {
-  constructor (error, status = 400) {
+  constructor (error, status = 406) {
     super();
     this.error = error;
     this.status = status;
@@ -28,4 +28,28 @@ export class AuthenticationError extends Error {
     this.error = error;
     this.status = status;
   } 
-}0
+}
+
+export class BadGatewayError extends Error {
+  constructor (error, status = 502) {
+    super();
+    this.error = error;
+    this.status = status;
+  }
+}
+
+export class NotDefinedError extends Error {
+  constructor (error, status = 404) {
+    super();
+    this.error = error;
+    this.status = status;
+  }
+}
+
+export class AlreadySignInError extends Error {
+  constructor (error, status = 400) {
+    super();
+    this.error = error;
+    this.status = status;
+  }
+}

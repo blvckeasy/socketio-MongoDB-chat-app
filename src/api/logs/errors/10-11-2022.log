@@ -1,0 +1,208 @@
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:10:18.634Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:11:18.390Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:12:04.509Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:13:56.641Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:14:17.128Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:14:31.646Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:15:01.418Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:15:19.357Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:15:40.577Z"
+    }
+}
+{
+    "error": "ReferenceError: next is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:16:21.892Z"
+    }
+}
+{
+    "error": "Error: TypeError: Cannot set properties of null (setting 'password')",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:17:03.189Z"
+    }
+}
+{
+    "error": "Error: TypeError: Cannot set properties of null (setting 'password')",
+    "info": {
+        "method": "GET",
+        "url": "/users/login",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:17:04.629Z"
+    }
+}
+{
+    "error": "ReferenceError: userService is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:17:49.778Z"
+    }
+}
+{
+    "error": "ReferenceError: userService is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:20:15.900Z"
+    }
+}
+{
+    "error": "ReferenceError: userService is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:20:47.240Z"
+    }
+}
+{
+    "error": "ReferenceError: userService is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-10T16:21:27.108Z"
+    }
+}

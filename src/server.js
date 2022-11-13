@@ -41,20 +41,7 @@ async function bootstrap() {
   })
 
   io.use(async (socket, next) => {
-    try {
-      const token = socket.handshake.auth.token || socket.handshake.headers.token;
-      if (!token) {
-        throw new Errors.AuthenticationError("invalid token")
-      }
-
-      const user = verifyToken(token);
-      // const found_user =
-
-    } catch (error) {
-      next(error); 
-    }
-
-    next();
+    
   })
 
   io.on('connection', socket => {
@@ -80,13 +67,14 @@ async function bootstrap() {
             })
         }
       }
-  
+      console.error(err);
       const error = {
-        error: err,
+        error: String(err),
         info: {
           method: req.method,
           url: req.url,
-          ip: req?.headers['x-forwarded-for'] || req.socket.remoteAddress,
+          ip: req?.headers['x-forwarded-for'] || req?.socket?.remoteAddress,
+          body: req?.body,
           date: new Date(),
         },
       }

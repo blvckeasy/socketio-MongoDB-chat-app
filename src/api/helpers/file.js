@@ -10,7 +10,7 @@ export async function CreateOrAppendFile (path, data) {
 
     return data;
   } catch (error) {
-    throw new Error(error);
+    throw error;
   }
 }
 
@@ -22,7 +22,7 @@ export async function WriteFile(path, data) {
 
     return data;
   } catch (error) {
-    throw new Error(error);
+    throw error;
   }
 }
 
@@ -34,7 +34,7 @@ export async function ReadFile(path) {
 
     return data;
   } catch (error) {
-    throw new Error(error);
+    throw error;
   }
 }
 
@@ -48,6 +48,6 @@ export async function AppendErrorToFile(error, filename = getCurrentDate()) {
 
     return error;
   } catch (error) {
-    throw new Error(error);
+    throw error;
   }
 }

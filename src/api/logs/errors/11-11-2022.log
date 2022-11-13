@@ -1,0 +1,26 @@
+{
+    "error": "ReferenceError: userService is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-11T04:07:41.069Z"
+    }
+}
+{
+    "error": "ReferenceError: userService is not defined",
+    "info": {
+        "method": "GET",
+        "url": "/users/",
+        "ip": "::1",
+        "body": {
+            "username": "username",
+            "password": "islom123123"
+        },
+        "date": "2022-11-11T04:31:52.884Z"
+    }
+}

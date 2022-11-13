@@ -1,14 +1,16 @@
-import { MongooseInvalidDataError, UnAuthorizationError } from "../helpers/error.js";
+import { BadGatewayError, MongooseInvalidDataError, NotDefinedError, UnAuthorizationError, AlreadySignInError } from "../helpers/error.js";
+import User from '../database/models/user.js';
+import UsersService from '../services/user.js';
 
 export default class UsersController {
-  constructor(UserRepository) {
-    this.User = UserRepository;
+  constructor(UserRepository = User) {
+    this.UserRepository = UserRepository;
+    this.userService = new UsersService(User);
   }
 
-  async getUsers(_, res) {
+  async getUsers(req, res, next) {
     try {
-      const users = await this.User.find().clone();
-      users.map((user) => user.password = undefined)
+      const users = await this.userService.getUsers();
       return res.send({
         status: 200,
         ok: true,
@@ -19,14 +21,13 @@ export default class UsersController {
       next(error);
     }
   }
-
-  async getUser(req, res) {
+  
+  async getUser(req, res, next) {
     try {
       const { id } = req.params
       if (!id) return res.send("id is require!");
   
-      const user = await this.User.findOne({ _id: id });
-      user.password = undefined
+      const user = await this.userService.getUser({_id: id});
   
       if (user) {
         return res.send({
@@ -48,155 +49,88 @@ export default class UsersController {
     }
   }
 
-  async login(req, res) {
+  async login(req, res, next) {
     try {
       const { username, password } = req.body;
-      if (!(username && password)) return res.send(new UnAuthorizationError("username and password is require!"));
-      
-      new Promise(async (resolve, reject) => {
-        await this.User.findOne({ username }, function (err, user) {
-          if (err) throw err;
-          if (!user) {
-            return reject();
-          }
-  
-          user.comparePassword(password, function(err, isMatch) {
-              if (err) throw err;
-  
-              if (isMatch) {
-                return resolve(user)
-              }
-              return reject(new UnAuthorizationError("invalid password"))
-          });
-        }).clone();
-      }).then(async (user) => {
-        if (user) {
-          user.password = undefined
-  
-          return res.send({
-            status: 200,
-            ok: true,
-            message: "The user successfully finded.",
-            data: user
-          });
-        } else {
-          return {
-            status: 404,
-            ok: false,
-            message: "The user is not registered.",
-            data: {}
-          }
-        }
-      }).catch((err) => {
-        return res.send({
-          status: 400,
-          ok: false,
-          error: err,
-        })
-      })
-    } catch (error) {
-      next(error);
-    }
-  }
+      if (!(username && password)) throw new UnAuthorizationError("username and password is require!");
 
-  async register(req, res) {
-    try {
-      const { username, password } = req.body;
-      if (!(username && password)) return res.send(new UnAuthorizationError("username and password is require!"));
-  
-      const found_user = await this.User.findOne({ username })
-      
-      if (!found_user) {
-        try {
-          const user = await this.User.create({ username, password })
-          return res.send({
-            status: 200,
-            ok: true,
-            message: "user successfully registered.",
-            data: user
-          });
-        } catch (error) {
-          return res.send({
-            status: 400,
-            ok: false,
-            error,
-            data: {}
-          })  
-        }
-      }
-  
+      const found_user = await this.userService.getUser({ username });
+      if (!found_user) throw new UnAuthorizationError("user not registered!");
+
+      const user = await this.userService.login(username, password)
+      if (!user) throw new UnAuthorizationError("The invalid password.");
+
       return res.send({
-        status: 400,
-        ok: false,
-        message: `"${username}" is already sign in`,
-        user: {}
+        status: 200,
+        ok: true,
+        message: "The user successfully finded.",
+        data: user
       })
     } catch (error) {
       next(error);
     }
   }
 
-  async update(req, res) {
+  async register(req, res, next) {
+    try {
+      const { username, password } = req.body;
+      if (!(username && password)) return res.send(new UnAuthorizationError("username and password is require!"));
+  
+      const found_user = await this.userService.getUser({ username });
+      if (found_user) throw new UnAuthorizationError("user already signin!");
+
+      const user = await this.userService.createUser(username, password);
+      return res.send({
+        status: 200,
+        ok: true,
+        data: user,
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req, res, next) {
     try {
       const { id } = req.params
-      if (!id) return res.send("id not defined");
-      const { username, password, old_password } = req.body
-      
-      if (!old_password) {
-        return res.send({
-          status: 400,
-          ok: false,
-          message: "old_password is require!",
-        })
+      const { username, new_password, old_password } = req.body
+      if (!id) throw new NotDefinedError("id is require!");
+
+      const user = await this.userService.getUser({ _id: id });
+      if (!user) throw UnAuthorizationError("user not defined!");
+
+      if (old_password) {
+        if (new_password) throw new NotDefinedError("password not defined!");
+        if (new_password === old_password) throw new BadGatewayError("password and old_password is equal!");
+
+        // The checkPassword function returns a boolean value comparing the password to the user's password
+        const check_password = user.checkPassword(new_password);
+        if (check_password) {
+          var updated_user = await this.userService.updateUser(id, { password: new_password });
+        } 
       }
-  
-      new Promise((resolve, reject) => {
-        this.User.findOne({ _id: id }, function (err, user) {
-          if (err) throw err;
-        
-          if (!user) {
-            return reject("user not defined");
-          }
-  
-          user.comparePassword(old_password, function(err, isMatch) {
-            if (err) throw err;
-            return isMatch ? resolve(user) : reject("invalid old_password");
-          })
-        }).clone();
-      }).then(async (user) => {
-        if (username) {
-          const found_username = await this.User.findOne({ username }).clone();
-          if (found_username) {
-            return res.send({
-              status: 400,
-              ok: false,
-              message: `"${username}" already taken.`,
-            })
-          }
-        }
-  
-        const updated_user = await this.User.findOneAndUpdate({ _id: id }, { username, password }).clone();
-        return res.send({
-          status: 200,
-          ok: true,
-          data: updated_user,
-        })
-      }).catch((err) => {
-        return res.send({
-          status: 400,
-          ok: false,
-          error: err,
-        })
-      })
+
+      if (username) {
+        const find_user_from_username = await this.userService.getUser({ username });
+        if (find_user_from_username) throw new UnAuthorizationError(`"${username}" username already taken!`);
+
+        updated_user = await this.userService.updateUser(id, { username });
+      }
+
+      return res.send({
+        ok: true,
+        message: "user successfully updated!",
+        data: updated_user,
+      }).status(201);
     } catch (error) {
       next(error);
     }
   }
 
-  async delete(req, res) {
+  async delete(req, res, next) {
     try {
       const { id } = req.params
-      const user = await this.User.findOne({ _id: id }).clone()
+      const user = await this.UserRepository.findOne({ _id: id }).clone()
       
       if (!id) return res.send({
         status: 400,
@@ -210,7 +144,7 @@ export default class UsersController {
         error: { message: "user not found!" }
       })
       
-      const deleted_user = await this.User.findOneAndDelete({ _id: id });
+      const deleted_user = await this.UserRepository.findOneAndDelete({ _id: id });
       deleted_user.password = undefined
     
       return res.send({
@@ -222,5 +156,10 @@ export default class UsersController {
     } catch (error) {
       next(error);
     }
+  }
+
+  async deleteAll() {
+    const deleted_users = await this.UserRepository.deleteMany();
+    return res.send(deleted_users);
   }
 }
