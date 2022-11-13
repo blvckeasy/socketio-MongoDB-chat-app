@@ -1,5 +1,4 @@
 import { BadGatewayError, MongooseInvalidDataError, NotDefinedError, UnAuthorizationError } from "../helpers/error.js";
-import User from '../database/models/user.js';
 import UsersService from '../services/user.js';
 
 export default class UsersController {
