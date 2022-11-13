@@ -7,7 +7,7 @@ export function signToken (payload) {
     const token = JWT.sign(payload, jwt_config.secretOrPrivateKey, jwt_config.options);
     return token;
   } catch (error) {
-    throw new Error(error);
+    throw error;
   }
 }
 

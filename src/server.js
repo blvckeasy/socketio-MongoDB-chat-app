@@ -6,10 +6,9 @@ import morgan from 'morgan'
 import { mongooseConnect } from './api/database/mongoose.js';
 import userRoutes from './api/routes/user.js'
 import messageRoutes from './api/routes/message.js'
-import { JWT, logger } from '../config.js'
-import * as Errors from './api/helpers/error.js'
-import { AppendErrorToFile } from './api/helpers/file.js'
-import { verifyToken } from './api/helpers/jwt.js'
+import { logger } from '../config.js'
+import { errorHandler } from './api/middlewares/error.handler.js'
+import { socketValidateRequest } from './socket-io/middlewares/validation.js'
 
 
 async function bootstrap() {
@@ -37,12 +36,10 @@ async function bootstrap() {
   mongooseConnect();
 
   app.get('/', (req, res) => {
-    return res.send('hello')
+    return res.send('Author: https://github.com/blvckeasy')
   })
 
-  io.use(async (socket, next) => {
-    
-  })
+  io.use(socketValidateRequest)
 
   io.on('connection', socket => {
     console.log('connect')
@@ -57,38 +54,7 @@ async function bootstrap() {
     })
   })
 
-  app.use((err, req, res, next) => {
-    try {
-      for (const error in Errors) {
-        if (err instanceof Errors[error]) {
-            return res.status(400).send({
-              ok: false,
-              error: err,
-            })
-        }
-      }
-      console.error(err);
-      const error = {
-        error: String(err),
-        info: {
-          method: req.method,
-          url: req.url,
-          ip: req?.headers['x-forwarded-for'] || req?.socket?.remoteAddress,
-          body: req?.body,
-          date: new Date(),
-        },
-      }
-      
-      AppendErrorToFile(error);
-    } catch (error) {
-      console.error(error);
-    }
-    return res.send({
-      ok: false,
-      message: "internal server error",
-    }).status(505)
-  })
-
+  app.use(errorHandler);
   server.listen(PORT, () => {
     console.log(`server running on http://${HOST}:${PORT}/`)
   })

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { database } from "../../../config.js";
+import { MongooseInvalidDataError } from "../helpers/error.js"
 
 export async function mongooseConnect() {
   try {
@@ -12,7 +13,7 @@ export async function mongooseConnect() {
     DB
       .on("open", () => console.log("You are connected to Mongo."))
       .on("close", () => console.log("You are   disconnected to Mongo."))
-      .on("error", (err) => console.error("somethig wrong .-_-.", err))
+      .on("error", (err) => console.error("something error -_-", err));
 
     await mongoose.connect(url, config)
     return true;
