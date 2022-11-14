@@ -1,4 +1,4 @@
-import { BadGatewayError, MongooseInvalidDataError, NotDefinedError, UnAuthorizationError } from "../helpers/error.js";
+import { BadGatewayError, MongooseInvalidDataError, NotFoundException, UnAuthorizationError } from "../helpers/error.js";
 import UsersService from '../services/user.js';
 
 export default class UsersController {
@@ -92,13 +92,13 @@ export default class UsersController {
     try {
       const { id } = req.params
       const { username, new_password, old_password } = req.body
-      if (!id) throw new NotDefinedError("id is require!");
+      if (!id) throw new NotFoundException("id is require!");
 
       const user = await this.userService.getUser({ _id: id });
       if (!user) throw UnAuthorizationError("user not defined!");
 
       if (old_password) {
-        if (new_password) throw new NotDefinedError("password not defined!");
+        if (new_password) throw new NotFoundException("password not defined!");
         if (new_password === old_password) throw new BadGatewayError("password and old_password is equal!");
 
         // The checkPassword function returns a boolean value comparing the password to the user's password

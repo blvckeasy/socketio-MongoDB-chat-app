@@ -6,6 +6,7 @@ import morgan from 'morgan'
 import { mongooseConnect } from './api/database/mongoose.js';
 import userRoutes from './api/routes/user.js'
 import messageRoutes from './api/routes/message.js'
+import userStatistics from './api/routes/user.statistics.js';
 import { logger } from '../config.js'
 import { errorHandler } from './api/middlewares/error.handler.js'
 import { socketValidateRequest } from './socket-io/middlewares/validation.js'
@@ -30,7 +31,8 @@ async function bootstrap() {
   }))
   app.use(Express.json())
   app.use(userRoutes);
-  app.use(messageRoutes)
+  app.use(messageRoutes);
+  app.use(userStatistics);
 
   // connect to mongoose
   mongooseConnect();

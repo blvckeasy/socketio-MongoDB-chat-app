@@ -52,3 +52,4 @@
 ::1 - - [13/Nov/2022:10:40:24 +0000] "POST /users/register HTTP/1.1" 500 46 "-" "PostmanRuntime/7.29.2"
 ::1 - - [13/Nov/2022:10:42:18 +0000] "POST /users/register HTTP/1.1" 400 66 "-" "PostmanRuntime/7.29.2"
 ::1 - - [13/Nov/2022:10:42:24 +0000] "POST /users/register HTTP/1.1" 400 423 "-" "PostmanRuntime/7.29.2"
+::1 - - [13/Nov/2022:11:11:08 +0000] "GET /messages HTTP/1.1" 200 881 "-" "PostmanRuntime/7.29.2"

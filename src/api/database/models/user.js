@@ -27,6 +27,11 @@ const UserSchema = new Schema({
     maxLength: [30, 'password length is too long. [8, 35]'],
     required: true
   },
+
+  registered_date: {
+    type: Date,
+    default: Date.now,
+  }
 })
 
 function hashPassword(next) {
@@ -75,5 +80,6 @@ UserSchema.methods.checkPassword = async function (candidatePassword) {
     throw error;
   }
 }
+
 
 export default mongoose.model("Users", UserSchema)

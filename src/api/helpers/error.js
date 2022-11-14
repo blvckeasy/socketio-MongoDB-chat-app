@@ -27,7 +27,7 @@ export class AuthenticationError extends Error {
     super();
     this.error = error;
     this.status = status;
-  } 
+  }
 }
 
 export class BadGatewayError extends Error {
@@ -38,16 +38,24 @@ export class BadGatewayError extends Error {
   }
 }
 
-export class NotDefinedError extends Error {
-  constructor (error, status = 404) {
+export class AlreadySignInError extends Error {
+  constructor (error, status = 400) {
     super();
     this.error = error;
     this.status = status;
   }
 }
 
-export class AlreadySignInError extends Error {
-  constructor (error, status = 400) {
+export class ForbiddenError extends Error {
+  constructor (error, status = 403) {
+    super();
+    this.error = error;
+    this.status = status;
+  }
+}
+
+export class NotFoundException extends Error {
+  constructor (error, status = 404) {
     super();
     this.error = error;
     this.status = status;

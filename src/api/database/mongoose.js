@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { database } from "../../../config.js";
-import { MongooseInvalidDataError } from "../helpers/error.js"
+
 
 export async function mongooseConnect() {
   try {
