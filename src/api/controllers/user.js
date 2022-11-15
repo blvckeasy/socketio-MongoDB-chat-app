@@ -1,5 +1,6 @@
 import { BadGatewayError, MongooseInvalidDataError, NotFoundException, UnAuthorizationError } from "../helpers/error.js";
 import UsersService from '../services/user.js';
+import { signToken } from '../helpers/jwt.js'
 
 export default class UsersController {
   constructor() {
@@ -55,14 +56,20 @@ export default class UsersController {
       const found_user = await this.userService.getUser({ username });
       if (!found_user) throw new UnAuthorizationError("user not registered!");
 
-      const user = await this.userService.login(username, password)
+      const user = JSON.parse(JSON.stringify(await this.userService.login(username, password)));
       if (!user) throw new UnAuthorizationError("The invalid password.");
+
+      user["user-agent"] = req.headers["user-agent"];
+      const token = signToken(user);
 
       return res.send({
         status: 200,
         ok: true,
         message: "The user successfully finded.",
-        data: user
+        data: user,
+        token: {
+          access_token: token
+        }
       })
     } catch (error) {
       next(error);
@@ -77,11 +84,17 @@ export default class UsersController {
       const found_user = await this.userService.getUser({ username });
       if (found_user) throw new UnAuthorizationError("user already signin!");
 
-      const user = await this.userService.createUser({ username, password });
+      const user = JSON.parse(JSON.stringify(Object.create(await this.userService.createUser({ username, password }))));
+      user["user-agent"] = req.headers["user-agent"];
+
+      const token = signToken(user);
       return res.send({
         status: 200,
         ok: true,
         data: user,
+        token: {
+          access_token: token,
+        }
       })
     } catch (error) {
       next(error);
@@ -112,13 +125,19 @@ export default class UsersController {
         const find_user_from_username = await this.userService.getUser({ username });
         if (find_user_from_username) throw new UnAuthorizationError(`"${username}" username already taken!`);
 
-        updated_user = await this.userService.updateUser(id, { username });
+        updated_user = JSON.parse(JSON.stringify(await this.userService.updateUser(id, { username })));
       }
+
+      updated_user["user-agent"] = req.headers["user-agent"];
+      const token = signToken(updated_user);
 
       return res.send({
         ok: true,
         message: "user successfully updated!",
         data: updated_user,
+        token: {
+          access_token: token,
+        }
       }).status(201);
     } catch (error) {
       next(error);
