@@ -10,6 +10,7 @@ const UsersStatisticsSchema = new Schema({
   user_id: {
     type: String,
     required: true,
+    ref: "Users"
   },
 
   SignIn_time: {

@@ -7,10 +7,19 @@ export default class UsersStatisticsService {
 
   async getUserStatistics(params) {
     try {
-      const statistics = await this.userStatisticsRepository.findOne(params);
+      const statistics = await this.userStatisticsRepository.find(params);
       return statistics;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getUserLastStatistic(params) {
+    try {
+      const statistics = await this.userStatisticsRepository.find(params);
+      return statistics[statistics.length - 1];
+    } catch (error) {
+      
     }
   }
 
@@ -23,9 +32,9 @@ export default class UsersStatisticsService {
     }
   }
 
-  async patchUserStatistics(filter, options) {
+  async patchUserStatistics(filter, update) {
     try {
-      const updated_statistics = await this.userStatisticsRepository.findOneAndDelete(filter, options);
+      const updated_statistics = await this.userStatisticsRepository.findOneAndUpdate(filter, update);
       return updated_statistics;
     } catch (error) {
       throw error;

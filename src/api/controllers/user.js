@@ -56,10 +56,10 @@ export default class UsersController {
       const found_user = await this.userService.getUser({ username });
       if (!found_user) throw new UnAuthorizationError("user not registered!");
 
-      const user = JSON.parse(JSON.stringify(await this.userService.login(username, password)));
+      const user = { ...(await this.userService.login(username, password))._doc };
       if (!user) throw new UnAuthorizationError("The invalid password.");
-
       user["user-agent"] = req.headers["user-agent"];
+      
       const token = signToken(user);
 
       return res.send({
@@ -84,7 +84,7 @@ export default class UsersController {
       const found_user = await this.userService.getUser({ username });
       if (found_user) throw new UnAuthorizationError("user already signin!");
 
-      const user = JSON.parse(JSON.stringify(Object.create(await this.userService.createUser({ username, password }))));
+      const user = { ...(await this.userService.createUser({ username, password }))._doc };
       user["user-agent"] = req.headers["user-agent"];
 
       const token = signToken(user);
@@ -125,7 +125,7 @@ export default class UsersController {
         const find_user_from_username = await this.userService.getUser({ username });
         if (find_user_from_username) throw new UnAuthorizationError(`"${username}" username already taken!`);
 
-        updated_user = JSON.parse(JSON.stringify(await this.userService.updateUser(id, { username })));
+        updated_user = { ...(await this.userService.updateUser(id, { username }))._doc };
       }
 
       updated_user["user-agent"] = req.headers["user-agent"];
