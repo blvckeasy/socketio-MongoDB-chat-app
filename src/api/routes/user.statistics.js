@@ -12,7 +12,6 @@ router.post("/userStatistics/connect", tokenValidation, function (req, res, next
 
 router.post("/userStatistics/disconnect", tokenValidation, function (req, res, next) {
   return usersStatisticsController.userDisconnected(req, res, next);
-  
 })
 
 router.post("/userStatistics/:user_id", (req, res, next) => usersStatisticsController.getUserStatistics(req, res, next));

@@ -41,7 +41,6 @@ export default class UsersStatisticsController {
       if (!(user && token)) throw new NotFoundException("token is require!");
       if (!user) user = verifyToken(token);
 
-
       const  found_user = await this.usersService.getUser({ _id: user._id });
       if (!found_user) throw new UnAuthorizationError("user not found!");
 

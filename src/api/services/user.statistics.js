@@ -19,7 +19,7 @@ export default class UsersStatisticsService {
       const statistics = await this.userStatisticsRepository.find(params);
       return statistics[statistics.length - 1];
     } catch (error) {
-      
+      throw error;
     }
   }
 
