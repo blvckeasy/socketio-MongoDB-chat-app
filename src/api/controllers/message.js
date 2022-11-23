@@ -9,21 +9,26 @@ export default class MessageController {
     this.User = UserRepository
   }
 
+  async deleteUndefinedFromObject(filter) {
+    Object.keys(filter).forEach(key => filter[key] === undefined ? delete filter[key] : {});
+    return filter;
+  }
+
   async getMessages(req, res, next) {
     try {
       const { to_user_id, from_user_id, id } = req.query
 
-      if (to_user_id && from_user_id) {
-        const messages = await this.Message.find({ from_user_id, to_user_id })
-        return res.send(messages || [])
-      }
-      if (id) {
-        const message = await this.Message.findOne({ _id: id }).clone()
-        return res.send(message || {})
-      }
+      // const found_sms_sended_user = await this.
 
-      const messages = await this.Message.find().clone()
-      return res.send(messages || [])
+      const filter = this.deleteUndefinedFromObject({ to_user_id, from_user_id, id });
+      const messages = await this.Message.find(filter).clone()
+
+      return res.send(JSON.stringify({
+        ok: true,
+        data: {
+          messages: messages || [],
+        }
+      })).status(201);
     } catch (error) {
       next(error);
     }

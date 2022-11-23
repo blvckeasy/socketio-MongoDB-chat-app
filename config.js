@@ -6,8 +6,11 @@ import { getCurrentDate } from './src/api/helpers/date.js'
 Dotenv.config();
 
 export const server = {
-  port: process.env.PORT || 3000,
   host: process.env.HOST || "localhost",
+  port: process.env.PORT || 3000,
+  url: function () {
+    return `http${this.host != "localhost" ? "s" : ""}://${this.host}:${this.port}`
+  },
 }
 
 export const cors = {

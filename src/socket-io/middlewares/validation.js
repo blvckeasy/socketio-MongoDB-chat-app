@@ -13,7 +13,10 @@ export async function socketValidateRequest (socket, next) {
     const user = verifyToken(token);
     const found_user = await userService.getUser({ _id: user._id });
     if (!found_user) throw new AuthenticationError("user is not defined!");
-
+    
+    socket.user = found_user;
+    socket.token = token;
+    
     next();
   } catch (error) {
     next(error); 

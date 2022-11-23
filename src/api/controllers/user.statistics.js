@@ -25,10 +25,10 @@ export default class UsersStatisticsController {
           { Exit_time: { $lte: end_time || Date.now() } }
         ]
       });
-      return res.send({
+      return res.send(JSON.stringify({
         ok: true,
         data: statistics,
-      }).status(200);
+      })).status(200);
     } catch (error) {
       next(error);
     }
@@ -62,14 +62,14 @@ export default class UsersStatisticsController {
       const statistics = await this.usersStatisticsService.postUserStatistics({ user_id: user._id });
       user.status = "online";
 
-      return res.send({
+      return res.send(JSON.stringify({
         ok: true,
         message: "user is successfully connected",
         data: {
           user,
           statistics
         }
-      }).status(200);
+      })).status(200);
     } catch (error) {
       next(error);
     }
@@ -103,14 +103,14 @@ export default class UsersStatisticsController {
       user.status = "offline";
 
       const user_last_statistics = await this.usersStatisticsService.getUserLastStatistic({ user_id: user._id });
-      return res.send({ 
+      return res.send(JSON.stringify({ 
         ok: true,
         message: "user is successfully disconnected",
         data: {
           user,
           statistic: user_last_statistics,
         }
-      }).status(200);
+      })).status(200);
     } catch (error) {
       next(error);
     }

@@ -10,12 +10,12 @@ export default class UsersController {
   async getUsers(req, res, next) {
     try {
       const users = await this.userService.getUsers();
-      return res.send({
+      return res.send(JSON.stringify({
         status: 200,
         ok: true,
         message: "OK.",
         data: users || []
-      })
+      }))
     } catch (error) {
       next(error);
     }
@@ -29,20 +29,20 @@ export default class UsersController {
       const user = await this.userService.getUser({_id: id});
   
       if (user) {
-        return res.send({
+        return res.send(JSON.stringify({
           status: 200,
           ok: true,
           message: "user found.",
           data: user
-        })
+        }))
       }
       
-      return res.send({
+      return res.send(JSON.stringify({
         status: 404,
         ok: false,
         message: "user not found.",
         data: {},
-      })
+      }))
     } catch (error) {
       next(error);
     }
@@ -62,7 +62,7 @@ export default class UsersController {
       
       const token = signToken(user);
 
-      return res.send({
+      return res.send(JSON.stringify({
         status: 200,
         ok: true,
         message: "The user successfully finded.",
@@ -70,7 +70,7 @@ export default class UsersController {
         token: {
           access_token: token
         }
-      })
+      }))
     } catch (error) {
       next(error);
     }
@@ -88,14 +88,14 @@ export default class UsersController {
       user["user-agent"] = req.headers["user-agent"];
 
       const token = signToken(user);
-      return res.send({
+      return res.send(JSON.stringify({
         status: 200,
         ok: true,
         data: user,
         token: {
           access_token: token,
         }
-      })
+      }))
     } catch (error) {
       next(error);
     }
@@ -131,14 +131,14 @@ export default class UsersController {
       updated_user["user-agent"] = req.headers["user-agent"];
       const token = signToken(updated_user);
 
-      return res.send({
+      return res.send(JSON.stringify({
         ok: true,
         message: "user successfully updated!",
         data: updated_user,
         token: {
           access_token: token,
         }
-      }).status(201);
+      })).status(201);
     } catch (error) {
       next(error);
     }
@@ -154,12 +154,12 @@ export default class UsersController {
       
       const deleted_user = await this.userService.deleteUser({ _id: id });
     
-      return res.send({
+      return res.send(JSON.stringify({
         status: 201,
         ok: true,
         message: "user successfully deleted!",
         data: deleted_user,
-      })
+      }))
     } catch (error) {
       next(error);
     }
