@@ -29,8 +29,8 @@ export function errorHandler(err, req, res, next) {
   } catch (error) {
     console.error(error)
   }
-  return res.send({
+  return res.send(JSON.stringify({
     ok: false,
     message: "internal server error",
-  }).status(500);
+  })).status(500);
 }

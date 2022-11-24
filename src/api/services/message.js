@@ -6,19 +6,18 @@ export default class MessageService {
     this.MessageRepository = Message;
   }
 
-  async getMessages(skip = 1, limit = 10) {
+  async getMessages(filter, skip = 1, limit = 10) {
     try {
-      const messages = await this.MessageRepository.find().limit(limit).skip(skip);
+      const messages = await this.MessageRepository.find(filter).limit(limit).skip(skip);
       return messages;
     } catch (error) {
       throw error;
     }
   }
 
-  async getUserMessages(from_user_id, to_user_id) {
+  async getUserMessages(filter) {
     try {
-      if (!(from_user_id && to_user_id)) throw UnAuthorizationError("from_user_id & to_user_id is require!");
-      const found_messages = await this.MessageRepository.find({ from_user_id, to_user_id });
+      const found_messages = await this.MessageRepository.find(filter);
 
       return found_messages;
     } catch (error) {
@@ -26,20 +25,20 @@ export default class MessageService {
     }
   }
 
-  async postMessage(from_user_id, to_user_id, message) {
+  async postMessage(params) {
     try {
-      const message = await this.MessageRepository.create({ from_user_id, to_user_id, message });
+      const message = await this.MessageRepository.create(params);
       return message;
     } catch (error) {
       throw error;
     }
   }
 
-  async patchMessage(_id, message) {
+  async patchMessage(filter, update) {
     try {
       // update message
-      await this.MessageRepository.findOneAndUpdate({ _id }, { message })
-      const found_message = await this.MessageRepository.findOne({ _id });
+      await this.MessageRepository.findOneAndUpdate(filter, update);
+      const found_message = await this.MessageRepository.findOne(filter);
 
       return found_message;
     } catch (error) {
@@ -47,9 +46,9 @@ export default class MessageService {
     }
   }
 
-  async deleteMessage(_id) {
+  async deleteMessage(params) {
     try {
-      const message = await this.MessageRepository.findOneAndDelete({ _id });
+      const message = await this.MessageRepository.findOneAndDelete(params);
       
       return message;
     } catch (error) {
@@ -57,10 +56,10 @@ export default class MessageService {
     }
   }
 
-  async deleteChat(from_user_id, to_user_id) {
+  async deleteChat(params) {
     try {
       const MESSAGE_REPOSITORY = this.MessageRepository;
-      const messages = await this.MessageRepository.find({ from_user_id, to_user_id });
+      const messages = await this.MessageRepository.find(params);
       let deleted_messages = [];
       
       messages.forEach(async function (message) {

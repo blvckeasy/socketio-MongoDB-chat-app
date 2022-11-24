@@ -1,3 +1,6 @@
 /node_modules
-*.log
 .env
+logs/errors/*.log
+logs/requests/*.log
+
+*.log
