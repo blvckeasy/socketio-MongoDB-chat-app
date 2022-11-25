@@ -1,4 +1,5 @@
 import {
+  ForbiddenError,
   MongooseInvalidDataError,
   NotFoundException,
   UnAuthorizationError,
@@ -15,7 +16,7 @@ export default class MessageController {
   }
 
   async deleteUndefinedFromObject(filter) {
-    Object.keys(filter).forEach(key => filter[key] === undefined ? delete filter[key] : {});
+    await Object.keys(filter).forEach(key => filter[key] === undefined ? delete filter[key] : {});
     return filter;
   }
 
@@ -27,8 +28,8 @@ export default class MessageController {
 
       if (found_sms_sended_user && found_sms_recipient_user) throw new NotFoundException("users not found!");
 
-      const filter = this.deleteUndefinedFromObject({ to_user_id, from_user_id, id });
-      const messages = await this.message
+      const filter = await this.deleteUndefinedFromObject({ to_user_id, from_user_id, id });
+      const messages = await this.messageService.getMessages(filter);
 
       return res.send(JSON.stringify({
         ok: true,
@@ -43,20 +44,23 @@ export default class MessageController {
 
   async postMessage(req, res, next) {
     try {
-      const { from_user_id, to_user_id, message } = req.body
-      if (!(from_user_id && to_user_id && message)) throw new NotFoundException("Insufficient data found in req body");
+      const { body: { to_user_id, message }, user } = req;
+      
+      if (!user) throw new UnAuthorizationError("user is require!");
+      if (!(user._id && to_user_id && message)) throw new NotFoundException("Insufficient data found in req body");
   
-      const select_users = (await this.User.findOne({
-          $or: [{ _id: from_user_id }, { _id: to_user_id }],
-        })) || []
+      const select_users = await this.usersService.getUsers({
+        $or: [{ _id: user._id }, { _id: to_user_id }],
+      }) || []
+
       // it is necessary to check that from_user_id and to_user_id are in the database
       if (select_users.length < 2) throw new UnAuthorizationError('from_user_id or to_user_id was not found in the database')
   
-      const newMessage = await this.Message.create({
-        from_user_id,
+      const newMessage = await this.messageService.postMessage({
+        from_user_id: user._id,
         to_user_id,
         message,
-      })
+      });
   
       return res.status(201).send(JSON.stringify({
         status: 201,
@@ -70,21 +74,15 @@ export default class MessageController {
 
   async editMessage(req, res, next) {
     try {
-      const { id } = req.params
-      const { message } = req.body
-  
-      const { error, data: updated_message } = await new Promise(resolve => {
-        this.Message.findOneAndUpdate(
-          { _id: id },
-          { message },
-          function (err, data) {
-            return resolve(err, data)
-          }
-        )
-      })
-  
-      if (error) return next(new MongooseInvalidDataError(error))
-  
+      const { body: { message }, params: { id }, user } = req;
+
+      const found_message = (await this.messageService.getUserMessages({ _id: id }))[0];
+      if (!found_message) throw new NotFoundException("message is not found in database!");
+      if (found_message.to_user_id != user._id && found_message.from_user_id != user._id || found_message.to_user_id == user._id) throw new ForbiddenError("You have not been granted access to this information!");
+
+      const updated_message = await this.messageService.patchMessage({ _id: id }, { message });
+      if (!updated_message) throw new NotFoundException("message not found!");
+
       return res.send(JSON.stringify({
         ok: true,
         message: 'message successfully edited.',
@@ -97,15 +95,16 @@ export default class MessageController {
 
   async deleteMessage(req, res, next) {
     try {
-      const { id } = req.params
-      const { error, data: deleted_message } = await new Promise((resolve) => {
-        this.Message.findOneAndDelete({ _id: id }, function (err, data) {
-          return resolve({error: 1, data: data || {}});
-        })
-      })
-      
-      if (error) return next(new MongooseInvalidDataError(error))
-      
+      const { params: { id }, user } = req;     
+      if (!id) throw new NotFoundException("id is require!");
+
+      const found_message = (await this.messageService.getMessages({ _id: id }))[0];
+      if (!found_message) throw new NotFoundException("message is not found in database!");
+      if (found_message.to_user_id != user._id && found_message.from_user_id != user._id) throw new ForbiddenError("You have not been granted access to this information!");
+
+      const deleted_message = await this.messageService.deleteMessage({ _id: id });
+      if (!deleted_message) throw new NotFoundException("message is not defined!");
+
       return res.send(JSON.stringify({
         ok: true,
         message: 'message successfully deleted.',

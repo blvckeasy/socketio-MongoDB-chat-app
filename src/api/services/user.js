@@ -5,9 +5,9 @@ export default class UsersService {
     this.userRepository = User;
   }
 
-  async getUsers() {
+  async getUsers(filter) {
     try {
-      const users = await this.userRepository.find().clone();
+      const users = await this.userRepository.find(filter);
       users.map((user) => user.password = undefined)
       return users
     } catch (error) {

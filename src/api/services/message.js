@@ -6,9 +6,9 @@ export default class MessageService {
     this.MessageRepository = Message;
   }
 
-  async getMessages(filter, skip = 1, limit = 10) {
+  async getMessages(filter) {
     try {
-      const messages = await this.MessageRepository.find(filter).limit(limit).skip(skip);
+      let messages = await this.MessageRepository.find(filter);
       return messages;
     } catch (error) {
       throw error;
@@ -18,7 +18,6 @@ export default class MessageService {
   async getUserMessages(filter) {
     try {
       const found_messages = await this.MessageRepository.find(filter);
-
       return found_messages;
     } catch (error) {
       throw error;
@@ -49,7 +48,6 @@ export default class MessageService {
   async deleteMessage(params) {
     try {
       const message = await this.MessageRepository.findOneAndDelete(params);
-      
       return message;
     } catch (error) {
       throw error;
