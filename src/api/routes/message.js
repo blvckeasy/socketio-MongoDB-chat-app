@@ -12,6 +12,6 @@ router.get("/messages", (req, res, next) => messageController.getMessages(req, r
 router.post("/messages/new", tokenValidation, (req, res, next) => messageController.postMessage(req, res, next));
 router.patch("/message/edit/:id", tokenValidation, (req, res, next) => messageController.editMessage(req, res, next));
 router.delete("/message/delete/:id", tokenValidation, (req, res, next) => messageController.deleteMessage(req, res, next));
-
+router.delete("/messages/delete/chat/:user_id", tokenValidation, (req, res, next) => messageController.deleteChat(req, res, next));
 
 export default router;

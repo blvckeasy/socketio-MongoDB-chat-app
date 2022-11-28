@@ -45,7 +45,7 @@ export default class MessageController {
   async postMessage(req, res, next) {
     try {
       const { body: { to_user_id, message }, user } = req;
-      
+
       if (!user) throw new UnAuthorizationError("user is require!");
       if (!(user._id && to_user_id && message)) throw new NotFoundException("Insufficient data found in req body");
   
@@ -62,11 +62,11 @@ export default class MessageController {
         message,
       });
   
-      return res.status(201).send(JSON.stringify({
+      return res.send(JSON.stringify({
         status: 201,
         message: 'Message successfully created.',
         data: newMessage,
-      }))
+      })).status(201)
     } catch (error) {
       next(error);
     }
@@ -87,7 +87,7 @@ export default class MessageController {
         ok: true,
         message: 'message successfully edited.',
         data: updated_message,
-      }))
+      })).status(200)
     } catch (error) {
       next(error);
     }
@@ -110,6 +110,37 @@ export default class MessageController {
         message: 'message successfully deleted.',
         data: deleted_message,
       })).status(200)
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteChat(req, res, next) {
+    try {
+      const { params: { user_id }, user } = req;
+      if (!user_id) throw new NotFoundException("id is require!");
+      if (!user) throw new UnAuthorizationError("user is not found!");
+
+      const found_messages = await this.messageService.getMessages({
+        $or: [
+          { from_user_id: user._id, to_user_id: user_id },
+          { from_user_id: user_id, to_user_id: user._id },
+        ]
+      });
+      if (!found_messages) throw new NotFoundException("chat not found!");
+
+      const delete_messages = await this.messageService.deleteChat({
+        $or: [
+          { from_user_id: user._id, to_user_id: user_id },
+          { from_user_id: user_id, to_user_id: user._id },
+        ]        
+      });
+
+      return res.send(JSON.stringify({
+        ok: true,
+        message: "chat successfully deleted",
+        data: delete_messages,
+      })).status(200);
     } catch (error) {
       next(error);
     }

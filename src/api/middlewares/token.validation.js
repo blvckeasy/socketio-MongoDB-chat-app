@@ -4,7 +4,6 @@ import { verifyToken } from "../helpers/jwt.js"
 export async function tokenValidation(req, res, next) {
   try {
     const token = req.headers["authorization"]?.split(" ")[1] || req.body?.token;
-    console.log('token', token);
     if (!token) throw new UnAuthorizationError("token is not defined");
 
     const user = verifyToken(token);

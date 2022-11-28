@@ -27,7 +27,6 @@ export default class UsersController {
       if (!id) return res.send("id is require!");
   
       const user = await this.userService.getUser({_id: id});
-  
       if (user) {
         return res.send(JSON.stringify({
           status: 200,

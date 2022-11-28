@@ -60,11 +60,11 @@ export default class MessageService {
       const messages = await this.MessageRepository.find(params);
       let deleted_messages = [];
       
-      messages.forEach(async function (message) {
+      for(const message of messages) {
         const deleted_message = await MESSAGE_REPOSITORY.findOneAndDelete({ _id: message._id });
-        deleted_message.push(deleted_message);
-      });
-
+        deleted_messages.push(deleted_message)
+      }
+      
       return deleted_messages;
     } catch (error) {
       throw error;
