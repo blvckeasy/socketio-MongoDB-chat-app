@@ -5,7 +5,6 @@ import User from '../database/models/user.js';
 import { tokenValidation } from "../middlewares/token.validation.js"
 
 const router = Router();
-
 const messageController = new MessageController(Message, User);
 
 router.get("/messages", (req, res, next) => messageController.getMessages(req, res, next));
@@ -13,5 +12,6 @@ router.post("/messages/new", tokenValidation, (req, res, next) => messageControl
 router.patch("/message/edit/:id", tokenValidation, (req, res, next) => messageController.editMessage(req, res, next));
 router.delete("/message/delete/:id", tokenValidation, (req, res, next) => messageController.deleteMessage(req, res, next));
 router.delete("/messages/delete/chat/:user_id", tokenValidation, (req, res, next) => messageController.deleteChat(req, res, next));
+
 
 export default router;

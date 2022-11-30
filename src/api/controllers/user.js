@@ -11,7 +11,6 @@ export default class UsersController {
     try {
       const users = await this.userService.getUsers();
       return res.send(JSON.stringify({
-        status: 200,
         ok: true,
         message: "OK.",
         data: users || []
@@ -27,20 +26,12 @@ export default class UsersController {
       if (!id) return res.send("id is require!");
   
       const user = await this.userService.getUser({_id: id});
-      if (user) {
-        return res.send(JSON.stringify({
-          status: 200,
-          ok: true,
-          message: "user found.",
-          data: user
-        }))
-      }
-      
+      if (!user) throw new NotFoundException("user not found!");
+
       return res.send(JSON.stringify({
-        status: 404,
-        ok: false,
-        message: "user not found.",
-        data: {},
+        ok: true,
+        message: "user found.",
+        data: user
       }))
     } catch (error) {
       next(error);
@@ -62,7 +53,6 @@ export default class UsersController {
       const token = signToken(user);
 
       return res.send(JSON.stringify({
-        status: 200,
         ok: true,
         message: "The user successfully finded.",
         data: user,
@@ -88,7 +78,6 @@ export default class UsersController {
 
       const token = signToken(user);
       return res.send(JSON.stringify({
-        status: 200,
         ok: true,
         data: user,
         token: {
