@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { server } from "../../../config.js";
+import { NotFoundException } from "../../api/helpers/error.js"
 
 export default class UserSocketController {
 
@@ -14,12 +15,11 @@ export default class UserSocketController {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
+        'user-agent': socket.request.headers['user-agent'],
       },
-    })
+    }) 
 
-    console.log(await response.json())
-
-    return await response;
+    return await response.json();
   }
 
   async userDisconnected (socket) {
@@ -29,11 +29,23 @@ export default class UserSocketController {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
+        'user-agent': socket.request.headers['user-agent'],
       },
     })
 
-    console.log(await response)
-
-    return await response;
+    return await response.json();
   }
+
+  async getUsers() {
+    const users = await fetch(this.apiURL + "/users");
+    return await users.json();
+  }
+
+  async getUser(id) {
+    if (!id) throw new NotFoundException("id is require!");
+    
+    const user = await fetch(this.apiURL + "/users/" + id);
+    return await user.json();
+  }
+
 }

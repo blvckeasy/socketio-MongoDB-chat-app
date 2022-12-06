@@ -5,10 +5,14 @@ export function errorHandler(err, req, res, next) {
   try {
     for (const error in Errors) {
       if (err instanceof Errors[error] || err.name == "ValidationError") {
-          return res.status(400).send({
-            ok: false,
-            error: err,
-          })
+          return res.status(400).send(JSON.stringify({
+            ok: false,  
+            error: {
+              status: err.status,
+              name: err.constructor?.name,
+              message: err.message,
+            }
+          }))
       }
     }
     
@@ -23,6 +27,7 @@ export function errorHandler(err, req, res, next) {
       },
     }
 
+    // for me
     console.error(err);
     
     AppendErrorToFile(error);
@@ -31,6 +36,10 @@ export function errorHandler(err, req, res, next) {
   }
   return res.send(JSON.stringify({
     ok: false,
-    message: "internal server error",
+    error: {
+        status: 500, 
+        name: "InternalServerError",
+        message: "internal server error",
+      },
   })).status(500);
 }
