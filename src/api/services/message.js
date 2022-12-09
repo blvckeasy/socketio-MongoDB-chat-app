@@ -70,4 +70,13 @@ export default class MessageService {
       throw error;
     }
   }
+
+  async deleteAllMessages() {
+    const all_messages = await this.getMessages();
+    
+    for (const message of all_messages)
+      await this.deleteMessage({ _id: message._id }); // delete all message
+
+    return all_messages;
+  }
 }

@@ -2,6 +2,7 @@ import Dotenv from 'dotenv';
 import Fs from 'fs'
 import Path from 'path'
 import { getCurrentDate } from './src/api/helpers/date.js'
+import { ForbiddenError } from './src/api/helpers/error.js'
 
 Dotenv.config();
 
@@ -32,6 +33,20 @@ export const logger = {
 export const pagination = {
   limit: process.env.PAGINATION_LIMIT || 10,
   page: process.env.PAGINATION_PAGE || 0,
+}
+
+// login and password required to clear data before releasing the project to production default login: "admin", password: "admin"
+export const admin = {
+  login: process.env.LOGIN || "admin",
+  password: process.env.PASSWORD || "admin",
+  /**
+   * @param login @param password
+   * returns true if the login and password are entered correctly, otherwise false.
+   */
+  check(login, password) {
+    if (login === this.login && password === this.password) return true;
+    return false;
+  }
 }
 
 export const JWT = {

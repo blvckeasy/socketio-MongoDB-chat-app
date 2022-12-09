@@ -1,6 +1,7 @@
-import { BadGatewayError, MongooseInvalidDataError, NotFoundException, UnAuthorizationError } from "../helpers/error.js";
+import { BadGatewayError, NotFoundException, UnAuthorizationError, ForbiddenError } from "../helpers/error.js";
 import UsersService from '../services/user.js';
 import { signToken } from '../helpers/jwt.js'
+import { admin } from '../../../config.js'
 
 export default class UsersController {
   constructor() {
@@ -89,6 +90,25 @@ export default class UsersController {
     }
   }
 
+  async updateUserSocketID (req, res, next) {
+    try {
+      const { body: { socket_id }, user } = req;
+      if (!socket_id) throw new NotFoundException("socket id not found");
+      
+      const updated_user = await this.userService.updateUser(user.id, { socket_id });
+      
+      return res.send(JSON.stringify({
+        ok: true,
+        message: "socket_id successfully updated",
+        data: {
+          user: updated_user
+        }
+      })).status(201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async update(req, res, next) {
     try {
       const { id } = req.params
@@ -143,11 +163,26 @@ export default class UsersController {
       const deleted_user = await this.userService.deleteUser({ _id: id });
     
       return res.send(JSON.stringify({
-        status: 201,
         ok: true,
         message: "user successfully deleted!",
         data: deleted_user,
-      }))
+      })).status(201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteAllUsers(req, res, next) {
+    try {
+      const { login, password } = req.body;
+      if (!(login && password)) throw new NotFoundException("login and password is require!");
+      if (!admin.check(login, password)) throw new ForbiddenError("login or password invalid!");
+
+      const deleted_users = await this.userService.deleteAllUsers();
+    
+      return res.send(JSON.stringify({
+        deleted_users
+      }));
     } catch (error) {
       next(error);
     }

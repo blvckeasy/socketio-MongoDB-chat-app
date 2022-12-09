@@ -16,5 +16,6 @@ router.post("/userStatistics/disconnect", tokenValidation, function (req, res, n
 
 router.post("/userStatistics/:user_id", (req, res, next) => usersStatisticsController.getUserStatistics(req, res, next));
 
+router.delete("/usersStatistics/delete/all", (req, res, next) => usersStatisticsController.deleteAllUsersStatistics(req, res, next));
 
 export default router;

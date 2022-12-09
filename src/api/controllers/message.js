@@ -1,11 +1,11 @@
 import {
   ForbiddenError,
-  MongooseInvalidDataError,
   NotFoundException,
   UnAuthorizationError,
 } from '../helpers/error.js'
 import UsersService from '../services/user.js'
 import MessageService from '../services/message.js'
+import { admin } from '../../../config.js'
 
 export default class MessageController {
   constructor(MessageRepository, UserRepository) {
@@ -141,6 +141,21 @@ export default class MessageController {
         message: "chat successfully deleted",
         data: delete_messages,
       })).status(200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteAllMessages(req, res, next) {
+    try {
+      const { login, password } = req.body;
+      if (!(login && password)) throw new NotFoundException("login and password is require!");
+      if (!admin.check(login, password)) throw new ForbiddenError("login or password invalid!");
+
+      const deleted_messages = await this.messageService.deleteAllMessages();
+      return res.send({
+        deleted_messages
+      });
     } catch (error) {
       next(error);
     }

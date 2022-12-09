@@ -15,6 +15,7 @@ import { errorHandler } from './api/middlewares/error.handler.js'
 import { socketValidateRequest } from './socket-io/middlewares/validation.js'
 import { logger as loggerConfig, server as serverConfig, cors as corsConfig, swagger as swaggerOptions } from '../config.js'
 import UserSocketController from './socket-io/controllers/user.js';
+import MessageSocketController from './socket-io/controllers/message.js'
 import { socketIOErrorHandler } from './socket-io/middlewares/error.handler.js'
 import { socketBodyParser } from './socket-io/helpers/json.parser.js'
 import { NotFoundException } from './api/helpers/error.js'
@@ -55,6 +56,7 @@ async function bootstrap() {
   io.use(socketValidateRequest);
 
   const userSocketController = new UserSocketController();
+  const messageSocketController = new MessageSocketController();
 
   io.on("connection", async function (socket) {
     const data = await userSocketController.userConnected(socket);
@@ -68,9 +70,7 @@ async function bootstrap() {
     })
   });
   
-  io.of("/users").on("connection", (socket) => {
-    // const id = socket.handshake.query.id;
-
+  io.of("/users").on("connection", async function (socket) {
     socket.on("get", async function (body) {
       try {
         body = socketBodyParser(body);
@@ -88,9 +88,28 @@ async function bootstrap() {
         return socketIOErrorHandler(error, socket);
       }
     })
-
-    // socket.on("")
   })
+
+  io.of("/messages").on("connection", async function (socket) {
+    console.log(socket.to);
+
+    socket.on("new-message", async function (body) {
+      try {
+        body = socketBodyParser(body);
+        const { user } = socket;
+        const { to_user_id, message } = body;
+
+        if (!(user && to_user_id && message)) throw new NotFoundException("to_user_id and message is require!");
+
+        const new_message = messageSocketController.postMessage(socket, body);
+        
+        // return socket.so
+      } catch (error) {
+        return socketIOErrorHandler(error, socket);
+      }
+    })
+  })
+
   // io.use(socketValidateRequest)
   // io.on('connection', async socket => {
 

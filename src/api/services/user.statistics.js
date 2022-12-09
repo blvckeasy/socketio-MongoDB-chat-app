@@ -49,4 +49,13 @@ export default class UsersStatisticsService {
       throw error;
     }
   }
+
+  async deleteAllUserStatistics() {
+    const all_user_statistics = await this.getUserStatistics();
+    
+    for (const statistic of all_user_statistics) 
+      await this.deleteUserStatistics({ _id: statistic._id });
+    
+    return all_user_statistics;
+  }
 }

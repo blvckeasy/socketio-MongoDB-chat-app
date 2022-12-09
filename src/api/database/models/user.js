@@ -11,6 +11,10 @@ const UserSchema = new Schema({
     default: UUID.v1,
   },
   
+  socket_id: {
+    type: String,
+    },
+  
   username: {
     type: String,
     minLength: [5, "Username is too short. [5, 40]"],

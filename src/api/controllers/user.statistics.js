@@ -1,7 +1,8 @@
 import UsersStatisticsService from '../services/user.statistics.js'
-import { NotFoundException, UnAuthorizationError } from '../helpers/error.js'
+import { ForbiddenError, NotFoundException, UnAuthorizationError } from '../helpers/error.js'
 import UsersService from '../services/user.js'
-import { verifyToken } from '../helpers/jwt.js'
+import { signToken, verifyToken } from '../helpers/jwt.js'
+import { admin } from '../../../config.js'
 
 export default class UsersStatisticsController {
   constructor() {
@@ -39,11 +40,14 @@ export default class UsersStatisticsController {
 
   async userConnected(req, res, next) {
     try {
-      let { user, token } = req
+      let { user, token } = req;
+      const { socket_id } = req.body;
 
       if (!(user && token)) throw new NotFoundException('token is require!')
       if (!user) user = verifyToken(token)
+      if (!socket_id) throw new NotFoundException('socket_id is require!')
 
+      
       const found_user = await this.usersService.getUser({ _id: user._id })
       if (!found_user) throw new UnAuthorizationError('user not found!')
 
@@ -63,20 +67,22 @@ export default class UsersStatisticsController {
       const statistics = await this.usersStatisticsService.postUserStatistics({
         user_id: user._id,
       })
+
+      // update user socket id
+      const updated_user = await this.usersService.updateUser(user._id, { socket_id });
       user.status = 'online'
 
-      return res
-        .send(
-          JSON.stringify({
-            ok: true,
-            message: 'user is successfully connected',
-            data: {
-              user,
-              statistics,
-            },
-          })
-        )
-        .status(200)
+      return res.send(JSON.stringify({
+        ok: true,
+        message: 'user is successfully connected',
+        data: {
+          user: updated_user,
+          statistics,
+        },
+        token: {
+          access_token: signToken(updated_user)
+        }
+      })).status(200)
     } catch (error) {
       next(error)
     }
@@ -112,20 +118,32 @@ export default class UsersStatisticsController {
         await this.usersStatisticsService.getUserLastStatistic({
           user_id: user._id,
         })
-      return res
-        .send(
-          JSON.stringify({
-            ok: true,
-            message: 'user is successfully disconnected',
-            data: {
-              user,
-              statistic: user_last_statistics,
-            },
-          })
-        )
-        .status(200)
+      return res.send(JSON.stringify({
+        ok: true,
+        message: 'user is successfully disconnected',
+        data: {
+          user,
+          statistic: user_last_statistics,
+        },
+      })).status(200)
     } catch (error) {
       next(error)
+    }
+  }
+
+  async deleteAllUsersStatistics(req, res, next) {
+    try {
+      const { login, password } = req.body;
+      if (!(login && password)) throw new NotFoundException("login and password is require!");
+      if (!admin.check(login, password)) throw new ForbiddenError("login or password invalid!");
+
+      const deleted_statistics = await this.usersStatisticsService.deleteAllUserStatistics();
+      
+      return res.send({
+        deleted_statistics
+      });
+    } catch (error) {
+      next(error);
     }
   }
 }

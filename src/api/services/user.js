@@ -1,4 +1,5 @@
 import User from '../database/models/user.js';
+import { InternalServerError, NotFoundException, UnAuthorizationError } from '../helpers/error.js'
 
 export default class UsersService {
   constructor() {
@@ -54,8 +55,17 @@ export default class UsersService {
   async updateUser(_id, params) {
     try {
       // update user params
+
+      console.log(_id);
+      console.log(params);
+
+      if (!(_id && params)) throw new InternalServerError("_id and params is require!");
+      const found_user = await this.userRepository.findOne({ _id });
+      if (!found_user) throw new InternalServerError("user not found!");
+
+      // update user params
       await this.userRepository.findOneAndUpdate({ _id }, params);
-      
+
       const updated_user = await this.userRepository.findOne({ _id });
       updated_user.password = undefined;
       return updated_user;
@@ -69,6 +79,19 @@ export default class UsersService {
       const deleted_user = await this.userRepository.findOneAndDelete(params);
       deleted_user.password = undefined 
       return deleted_user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteAllUsers() {
+    try {
+      const all_user = await this.getUsers();
+
+      for(const user of all_user)
+        await this.deleteUser({ _id: user._id }); // delete all users
+      
+      return all_user;
     } catch (error) {
       throw error;
     }

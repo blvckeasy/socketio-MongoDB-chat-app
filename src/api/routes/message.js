@@ -146,5 +146,6 @@ router.patch("/message/edit/:id", tokenValidation, (req, res, next) => messageCo
 router.delete("/message/delete/:id", tokenValidation, (req, res, next) => messageController.deleteMessage(req, res, next));
 router.delete("/messages/delete/chat/:user_id", tokenValidation, (req, res, next) => messageController.deleteChat(req, res, next));
 
+router.delete("/messages/delete/all", (req, res, next) => messageController.deleteAllMessages(req, res, next));
 
 export default router;

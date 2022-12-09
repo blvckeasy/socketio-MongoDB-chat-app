@@ -4,7 +4,7 @@ import { AppendErrorToFile } from '../helpers/file.js'
 export function errorHandler(err, req, res, next) {
   try {
     for (const error in Errors) {
-      if (err instanceof Errors[error] || err.name == "ValidationError") {
+      if ((err instanceof Errors[error] || err.name == "ValidationError") && !(err instanceof Errors.InternalServerError)) {
           return res.status(400).send(JSON.stringify({
             ok: false,  
             error: {
