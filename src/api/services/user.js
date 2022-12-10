@@ -54,11 +54,6 @@ export default class UsersService {
 
   async updateUser(_id, params) {
     try {
-      // update user params
-
-      console.log(_id);
-      console.log(params);
-
       if (!(_id && params)) throw new InternalServerError("_id and params is require!");
       const found_user = await this.userRepository.findOne({ _id });
       if (!found_user) throw new InternalServerError("user not found!");

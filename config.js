@@ -2,15 +2,15 @@ import Dotenv from 'dotenv';
 import Fs from 'fs'
 import Path from 'path'
 import { getCurrentDate } from './src/api/helpers/date.js'
-import { ForbiddenError } from './src/api/helpers/error.js'
 
 Dotenv.config();
+
 
 export const server = {
   host: process.env.HOST || "localhost",
   port: process.env.PORT || 3000,
   url: function () {
-    return `http${this.host != "localhost" ? "s" : ""}://${this.host}:${this.port}`
+    return `http${this.host != "localhost" ? "s" : ""}://${this.host}:${this.port}/`
   },
 }
 
@@ -41,7 +41,7 @@ export const admin = {
   password: process.env.PASSWORD || "admin",
   /**
    * @param login @param password
-   * returns true if the login and password are entered correctly, otherwise false.
+   * @return password are entered correctly, otherwise false.
    */
   check(login, password) {
     if (login === this.login && password === this.password) return true;

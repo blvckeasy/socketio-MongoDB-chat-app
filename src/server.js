@@ -144,7 +144,7 @@ async function bootstrap() {
 
   app.use(errorHandler);
   server.listen(PORT, () => {
-    console.log(`server running on ${serverConfig.url()}`);
+    console.log(`server running on ${serverConfig.url()} 🚀`);
   })
 }
 
