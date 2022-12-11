@@ -3,7 +3,6 @@ import Express from 'express'
 import { Server as Socket } from 'socket.io'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import customParser from 'socket.io-msgpack-parser';
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUI from 'swagger-ui-express'
 
@@ -144,7 +143,7 @@ async function bootstrap() {
 
   app.use(errorHandler);
   server.listen(PORT, () => {
-    console.log(`server running on ${serverConfig.url()} 🚀`);
+    console.log(`🚀 server running on ${serverConfig.url()}`);
   })
 }
 

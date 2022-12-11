@@ -4,3 +4,4 @@ logs/errors/*.log
 logs/requests/*.log
 *.log
 *-lock.json
+/files/profile-images/*

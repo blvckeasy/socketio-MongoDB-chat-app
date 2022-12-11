@@ -1,6 +1,8 @@
 import Fs from 'fs/promises';
 import Path from 'path';
 import { getCurrentDate } from './date.js';
+import { ForbiddenError, InternalServerError, InvalidDataException } from './error.js'
+import { generateRandomNumber } from './random.generate.js'
 
 export async function CreateOrAppendFile (path, data) {
   try {
@@ -14,10 +16,13 @@ export async function CreateOrAppendFile (path, data) {
   }
 }
 
-export async function WriteFile(path, data) {
+export async function WriteFile(path, data, options) {
   try {
     await Fs.writeFile(path, data, {
-      encoding: "utf-8"
+      encoding: options?.encoding || 'utf-8',
+      flag: options?.flag,
+      mode: options?.mode,
+      signal: options?.signal,
     });
 
     return data;
@@ -50,4 +55,25 @@ export async function AppendErrorToFile(error, filename = getCurrentDate()) {
   } catch (error) {
     throw error;
   }
+}
+
+export function getFileExtension(filename) {
+  if(!filename) throw new InternalServerError("filename not found!");
+  return filename.split('.').pop();
+}
+
+export async function writeProfileImage(file, options) {
+  if (!file) throw new InternalServerError("file is require!");
+  const { buffer, originalname, mimetype } = file;
+
+  console.log('mimetype:', mimetype);
+  
+  if (mimetype?.split('/')[0] != 'image') throw new InvalidDataException("Just upload a picture!")
+
+  const file_name = `${generateRandomNumber(16)}.${getFileExtension(originalname)}`;
+  const path = Path.join(process.cwd(), "files", "profile-images", file_name);
+  
+  await WriteFile(path, buffer, options);
+  
+  return file_name;
 }

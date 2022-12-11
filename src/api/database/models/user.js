@@ -13,8 +13,13 @@ const UserSchema = new Schema({
   
   socket_id: {
     type: String,
-    },
+  },
   
+  profile_img: {
+    type: String,
+    default: 'user.jpg'
+  },
+
   username: {
     type: String,
     minLength: [5, "Username is too short. [5, 40]"],

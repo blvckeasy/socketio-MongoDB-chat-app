@@ -1,7 +1,9 @@
+import Path from 'path';
 import { BadGatewayError, NotFoundException, UnAuthorizationError, ForbiddenError } from "../helpers/error.js";
 import UsersService from '../services/user.js';
 import { signToken } from '../helpers/jwt.js'
 import { admin } from '../../../config.js'
+import { writeProfileImage } from "../helpers/file.js"
 
 export default class UsersController {
   constructor() {
@@ -39,6 +41,26 @@ export default class UsersController {
     }
   }
 
+  async getProfileImage(req, res, next) {
+    try {
+      const { userId, fileName } = req.params;
+      if (!(userId || fileName)) throw new NotFoundException("userId or fileName is require!");
+
+      if (userId) {
+        const found_user = await this.userService.getUser({ _id: userId });
+        if (!found_user) throw new NotFoundException("user not found!");
+        
+        return res.sendFile(Path.join(process.cwd(), 'files', 'profile-images', found_user.profile_img));
+      }
+      if (fileName) {
+        return res.sendFile(Path.join(process.cwd(), 'files', 'profile-images', fileName));
+      }
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async login(req, res, next) {
     try {
       const { username, password } = req.body;
@@ -68,13 +90,18 @@ export default class UsersController {
 
   async register(req, res, next) {
     try {
-      const { username, password } = req.body;
+      const { body: { username, password }, file } = req;
       if (!(username && password)) return res.send(new UnAuthorizationError("username and password is require!"));
   
       const found_user = await this.userService.getUser({ username });
       if (found_user) throw new UnAuthorizationError("user already signin!");
+      let filename;
 
-      const user = { ...(await this.userService.createUser({ username, password }))._doc };
+      if (file) {
+        filename = await writeProfileImage(file);
+      }
+
+      const user = { ...(await this.userService.createUser({ username, password, profile_img: filename }))._doc };
       user["user-agent"] = req.headers["user-agent"];
 
       const token = signToken(user);

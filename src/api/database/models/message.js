@@ -24,6 +24,11 @@ const MessageSchema = new Schema({
     max: 500
   },
 
+  type: {
+    type: String,
+    default: "message",
+  },
+
   sended_time: {
     type: Date,
     default: +new Date() + 7 * 24 * 60 * 60 * 1000,
