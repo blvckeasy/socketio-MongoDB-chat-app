@@ -4,7 +4,7 @@ import UsersService from '../services/user.js'
 import { signToken, verifyToken } from '../helpers/jwt.js'
 import { admin } from '../../../config.js'
 
-export default class UsersStatisticsController {
+export default class UserStatisticsController {
   constructor() {
     this.usersStatisticsService = new UsersStatisticsService()
     this.usersService = new UsersService()
@@ -41,11 +41,11 @@ export default class UsersStatisticsController {
   async userConnected(req, res, next) {
     try {
       let { user, token } = req;
-      const { socket_id } = req.body;
+      const { socketId } = req.body;
 
       if (!(user && token)) throw new NotFoundException('token is require!')
       if (!user) user = verifyToken(token)
-      if (!socket_id) throw new NotFoundException('socket_id is require!')
+      if (!socketId) throw new NotFoundException('socketId is require!')
 
       
       const found_user = await this.usersService.getUser({ _id: user._id })
@@ -69,7 +69,7 @@ export default class UsersStatisticsController {
       })
 
       // update user socket id
-      const updated_user = await this.usersService.updateUser(user._id, { socket_id });
+      const updated_user = await this.usersService.updateUser(user._id, { socket_id: socketId });
       user.status = 'online'
 
       return res.send(JSON.stringify({

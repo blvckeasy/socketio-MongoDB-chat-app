@@ -1,6 +1,5 @@
 import { Router } from "express";
 import Multer from "multer";
-import { join } from "path";
 import User from '../database/models/user.js'
 import UsersController from "../controllers/user.js"
 

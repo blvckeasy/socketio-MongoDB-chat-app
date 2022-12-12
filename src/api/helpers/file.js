@@ -66,8 +66,6 @@ export async function writeProfileImage(file, options) {
   if (!file) throw new InternalServerError("file is require!");
   const { buffer, originalname, mimetype } = file;
 
-  console.log('mimetype:', mimetype);
-  
   if (mimetype?.split('/')[0] != 'image') throw new InvalidDataException("Just upload a picture!")
 
   const file_name = `${generateRandomNumber(16)}.${getFileExtension(originalname)}`;

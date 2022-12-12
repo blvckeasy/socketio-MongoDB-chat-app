@@ -1,43 +1,12 @@
 import fetch from "node-fetch";
-import { server } from "../../../config.js";
-import { NotFoundException } from "../../api/helpers/error.js"
+import { server } from "../../../config.js"
+import { InternalServerError, NotFoundException } from "../../api/helpers/error.js"
 
 export default class UserSocketController {
   #apiURL;
 
   constructor () {
     this.#apiURL = server.url();
-  }
-
-  async userConnected (socket) {
-    const { token } = socket;
-    const response = await fetch(this.#apiURL + "/userStatistics/connect", {
-      method: "POST",
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'user-agent': socket.request.headers['user-agent'],
-      },
-      body: JSON.stringify({
-        socket_id: socket.id,
-      })
-    }) 
-
-    return await response.json();
-  }
-
-  async userDisconnected (socket) {
-    const { token } = socket;
-    const response = await fetch(this.#apiURL + "/userStatistics/disconnect", {
-      method: "POST",
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'user-agent': socket.request.headers['user-agent'],
-      },
-    })
-
-    return await response.json();
   }
 
   async getUsers() {
@@ -52,4 +21,10 @@ export default class UserSocketController {
     return await user.json();
   }
 
+  // coming soon... ----
+  // async updateUserSocketID(socket) {
+  //   if (!socket) throw new InternalServerError("socket is not defined!");
+  //   const user = await fetch(this.#apiURL + "/users")
+  // }
+  // ---------
 }

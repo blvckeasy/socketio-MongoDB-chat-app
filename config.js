@@ -10,7 +10,7 @@ export const server = {
   host: process.env.HOST || "localhost",
   port: process.env.PORT || 3000,
   url: function () {
-    return `http${this.host != "localhost" ? "s" : ""}://${this.host}:${this.port}/`
+    return `http${this.host != "localhost" ? "s" : ""}://${this.host}:${this.port}`
   },
 }
 
@@ -22,7 +22,10 @@ export const cors = {
 };
 
 export const database = {
-  url: process.env.DB_URL
+  url: process.env.DB_URL,
+  config: {
+    useNewUrlParser: true,
+  }
 }
 
 export const logger = {
