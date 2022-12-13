@@ -119,16 +119,15 @@ export default class UsersController {
 
   async updateUserSocketID (req, res, next) {
     try {
-      const { body: { socket_id }, user } = req;
-      if (!socket_id) throw new NotFoundException("socket id not found");
-      
-      const updated_user = await this.userService.updateUser(user.id, { socket_id });
-      
+      const { body: { socketID }, user } = req;
+      if (!socketID) throw new NotFoundException("socket id not found");
+
+      const updated_user = await this.userService.updateUser(user._id, { socket_id: socketID });
       return res.send(JSON.stringify({
         ok: true,
-        message: "socket_id successfully updated",
+        message: "socketID successfully updated",
         data: {
-          user: updated_user
+          user: updated_user,
         }
       })).status(201);
     } catch (error) {

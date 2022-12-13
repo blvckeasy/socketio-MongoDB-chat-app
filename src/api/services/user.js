@@ -63,6 +63,8 @@ export default class UsersService {
 
       const updated_user = await this.userRepository.findOne({ _id });
       updated_user.password = undefined;
+      updated_user.socket_id = undefined; // it cannot be added to the token as it is always changing.
+
       return updated_user;
     } catch (error) {
       throw error;

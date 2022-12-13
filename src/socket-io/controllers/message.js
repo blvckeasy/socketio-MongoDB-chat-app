@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { server } from "../../../config.js";
 import { NotFoundException } from "../../api/helpers/error.js"
+import { verifyToken } from "../../api/helpers/jwt.js"
 
 export default class MessageSocketController {
   #apiURL;
@@ -11,6 +12,10 @@ export default class MessageSocketController {
 
   async postMessage(socket, body) {
     const { token } = socket;
+
+    // console.log('s1:', socket.request.headers['user-agent']);
+    console.log(`user:`,verifyToken(token));
+    console.log("\n\n");
 
     const response = await fetch(this.#apiURL + "/messages/new", {
       method: "POST",

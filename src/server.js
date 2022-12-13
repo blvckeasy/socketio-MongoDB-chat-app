@@ -25,6 +25,7 @@ import { socketBodyParser } from './socket-io/helpers/json.parser.js'
 import { NotFoundException } from './api/helpers/error.js'
 import UserSocketController from './socket-io/controllers/user.js'
 
+
 async function bootstrap() {
   const HOST = serverConfig.host || 'localhost'
   const PORT = serverConfig.port || 3000
@@ -51,7 +52,7 @@ async function bootstrap() {
   app.use(userStatistics)
 
   // connect to mongoose
-  mongooseConnect()
+  mongooseConnect();
 
   app.get('/', (_, res) => {
     return res.send('Author: https://github.com/blvckeasy')
@@ -81,7 +82,7 @@ async function bootstrap() {
 
   io.of('/users').use(socketValidateRequest)
   io.of('/users').on('connection', async function (socket) {
-    socket.use(socketBodyParser)
+    socket.use(socketBodyParser);
 
     socket.on('get', async function (body) {
       try {
@@ -121,32 +122,25 @@ async function bootstrap() {
     socket.use(socketBodyParser)
     socket.on('post-new-text-message', async function (body) {
       try {
-        console.log(typeof body)
+        const { user } = socket;
+        const { to_user_id, message } = body;
 
-        const { user } = socket
-        const { to_user_id, message } = body
+        if (!(user && to_user_id && message)) throw new NotFoundException('to_user_id and message is require!');
 
-        if (!(user && to_user_id && message))
-          throw new NotFoundException('to_user_id and message is require!')
+        const { data: found_user } = await userSocketController.getUser(to_user_id);
+        if (!found_user) throw new NotFoundException('user is "to_user_id" not found!');
 
-        const { data: found_user } = await userSocketController.getUser(
-          to_user_id
-        )
-        if (!found_user)
-          throw new NotFoundException('user is "to_user_id" not found!')
-
-        const new_message = await messageSocketController.postMessage(
-          socket,
-          body
-        )
+        const new_message = await messageSocketController.postMessage(socket, body)
 
         // socket.to(found_user.socket_id).emit('get-new-text-message', new_message);
         // return
         // return io.to([found_user?.socket_id, socket.id]).emit('get-new-text-message', new_message);
-        socket.emit('get-new-text-message', new_message)
-        return io
-          .to(found_user?.socket_id)
-          .emit('get-new-text-message', new_message)
+        
+        console.log('new_message', new_message);
+
+
+        socket.emit('get-new-text-message', new_message);
+        return socket.to(found_user?.socket_id).emit('get-new-text-message', new_message);
       } catch (error) {
         return socketIOErrorHandler(error, socket)
       }

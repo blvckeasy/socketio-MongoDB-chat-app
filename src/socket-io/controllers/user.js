@@ -21,10 +21,24 @@ export default class UserSocketController {
     return await user.json();
   }
 
-  // coming soon... ----
-  // async updateUserSocketID(socket) {
-  //   if (!socket) throw new InternalServerError("socket is not defined!");
-  //   const user = await fetch(this.#apiURL + "/users")
-  // }
-  // ---------
+  async updateUserSocketID(socket) {
+    if (!socket) throw new InternalServerError("socket is not defined!");
+    
+    const { token } = socket;
+    if (!token) throw new NotFoundException("token not found!");
+    
+    const response = await fetch(this.#apiURL + "/users/update/socketID", {
+      method: "PATCH",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'User-Agent': socket.request.headers['user-agent'],
+      },
+      body: JSON.stringify({
+        socketID: socket.id,
+      })
+    })
+    
+    return await response.json();
+  }
 }
