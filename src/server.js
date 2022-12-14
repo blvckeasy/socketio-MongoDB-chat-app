@@ -113,7 +113,6 @@ async function bootstrap() {
       try {
         const { user } = socket;
         const { to_user_id, message } = body;
-        if (!user) throw new UnAuthorizationError("user not found!");
         if (!(to_user_id && message)) throw new NotFoundException('to_user_id and message is require!');
 
         const { data: found_user } = await userSocketController.getUser(to_user_id);
@@ -132,8 +131,7 @@ async function bootstrap() {
       try {
         const { user } = socket;
         const { message_id, message } = body;
-        if (!user) throw new UnAuthorizationError("user not found!");  
-        if (!(message_id && message)) throw new NotFoundException("message_id or message is not defined!");
+        if (!(message_id && message)) throw new NotFoundException("message_id or message is require!");
 
         const found_message = await messageService.getMessage({ _id: message_id });
         if (!found_message) throw new NotFoundException("message not Found!");
@@ -152,7 +150,14 @@ async function bootstrap() {
 
     socket.on('delete-message', async function (body) {
       try {
-        
+        const { user } = socket;
+        const { message_id } = body;
+
+        if (!message_id) throw new NotFoundException("message_id is require!");        
+
+        const deleted_message = await messageSocketController.deleteMessage(socket, body);
+
+        socket.emit('delete-deleted-message', deleted_message);
       } catch (error) {
         console.error(error);
         return socketIOErrorHandler(error, socket);

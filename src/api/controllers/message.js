@@ -88,16 +88,17 @@ export default class MessageController {
       const updated_message = (await this.messageService.patchMessage({ _id: id }, { message }))._doc;
       if (!updated_message) throw new NotFoundException("message not found!");
 
-      updated_message.from_user = await this.userService.getUser({ _id: user._id });
-      updated_message.to_user = await this.userService.getUser({ _id: found_message.to_user_id }) 
-
-      updated_message.from_user_id = undefined;
-      updated_message.to_user_id = undefined;
+      const from_user = await this.userService.getUser({ _id: user._id });
+      const to_user = await this.userService.getUser({ _id: found_message.to_user_id }) 
 
       return res.send(JSON.stringify({
         ok: true,
         message: 'message successfully edited.',
-        data: updated_message,
+        data: {
+          from_user,
+          to_user,
+          updated_message
+        },
       })).status(200)
     } catch (error) {
       next(error);
@@ -116,10 +117,17 @@ export default class MessageController {
       const deleted_message = await this.messageService.deleteMessage({ _id: id });
       if (!deleted_message) throw new NotFoundException("message is not defined!");
 
+      const from_user = await this.userService.getUser({ _id: user._id });
+      const to_user = await this.userService.getUser({ _id: found_message.to_user_id });
+
       return res.send(JSON.stringify({
         ok: true,
         message: 'message successfully deleted.',
-        data: deleted_message,
+        data: {
+          from_user,
+          to_user,
+          deleted_message
+        },
       })).status(200)
     } catch (error) {
       next(error);
@@ -129,8 +137,8 @@ export default class MessageController {
   async deleteChat(req, res, next) {
     try {
       const { params: { user_id }, user } = req;
-      if (!user_id) throw new NotFoundException("id is require!");
       if (!user) throw new UnAuthorizationError("user is not found!");
+      if (!user_id) throw new NotFoundException("id is require!");
 
       const found_messages = await this.messageService.getMessages({
         $or: [
@@ -147,16 +155,24 @@ export default class MessageController {
         ]        
       });
 
+      const from_user = await this.userService.getUser({ _id: user._id });
+      const to_user = await this.userService.getUser({ _id: found_messages[0].to_user_id });
+
       return res.send(JSON.stringify({
         ok: true,
         message: "chat successfully deleted",
-        data: delete_messages,
+        data: {
+          from_user,
+          to_user,
+          delete_messages
+        },
       })).status(200);
     } catch (error) {
       next(error);
     }
   }
 
+  // Write to delete mock data.
   async deleteAllMessages(req, res, next) {
     try {
       const { login, password } = req.body;
@@ -164,9 +180,7 @@ export default class MessageController {
       if (!admin.check(login, password)) throw new ForbiddenError("login or password invalid!");
 
       const deleted_messages = await this.messageService.deleteAllMessages();
-      return res.send({
-        deleted_messages
-      });
+      return res.send({ deleted_messages });
     } catch (error) {
       next(error);
     }

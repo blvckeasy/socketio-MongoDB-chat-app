@@ -198,6 +198,7 @@ export default class UsersController {
     }
   }
 
+  // Write to delete mock data.
   async deleteAllUsers(req, res, next) {
     try {
       const { login, password } = req.body;

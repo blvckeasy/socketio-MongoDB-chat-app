@@ -43,7 +43,7 @@ export default class MessageSocketController {
 
   async deleteMessage(socket, body) {
     const { token } = socket;
-    const { id: message_id } = body;
+    const { message_id } = body;
     
     const response = await fetch(this.#apiURL + `/message/delete/${message_id}`, {
       method: "DELETE",

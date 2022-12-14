@@ -1,4 +1,4 @@
-import { AuthenticationError, ForbiddenError } from '../../api/helpers/error.js'
+import { AuthenticationError, ForbiddenError, UnAuthorizationError } from '../../api/helpers/error.js'
 import UsersService from '../../api/services/user.js'
 import { verifyToken } from '../../api/helpers/jwt.js'
 import UserSocketController from '../controllers/user.js'
@@ -22,6 +22,8 @@ export async function socketValidateRequest(socket, next) {
     
     socket.token = token;
     const { data: { user: updatedUser } } = await userSocketController.updateUserSocketID(socket);
+
+    if (!updatedUser) throw new UnAuthorizationError("user not authorization!");
 
     updatedUser.socket_id = socket.id;
     socket.user = updatedUser;
