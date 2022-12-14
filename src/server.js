@@ -132,13 +132,6 @@ async function bootstrap() {
 
         const new_message = await messageSocketController.postMessage(socket, body)
 
-        // socket.to(found_user.socket_id).emit('get-new-text-message', new_message);
-        // return
-        // return io.to([found_user?.socket_id, socket.id]).emit('get-new-text-message', new_message);
-        
-        console.log('new_message', new_message);
-
-
         socket.emit('get-new-text-message', new_message);
         return socket.to(found_user?.socket_id).emit('get-new-text-message', new_message);
       } catch (error) {

@@ -23,10 +23,8 @@ export async function socketValidateRequest(socket, next) {
     socket.token = token;
     const { data: { user: updatedUser } } = await userSocketController.updateUserSocketID(socket);
 
+    updatedUser.socket_id = socket.id;
     socket.user = updatedUser;
-    socket.token = token;
-
-    socket.emit("get-new-token", newToken);
 
     next();
   } catch (error) {
