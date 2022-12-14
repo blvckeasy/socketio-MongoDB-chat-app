@@ -131,20 +131,28 @@ async function bootstrap() {
     socket.on('patch-edit-message', async function (body) {
       try {
         const { user } = socket;
-        const { message_id } = body;
+        const { message_id, message } = body;
         if (!user) throw new UnAuthorizationError("user not found!");  
-        if (!message_id) throw new NotFoundException("message_id is not defined!");
+        if (!(message_id && message)) throw new NotFoundException("message_id or message is not defined!");
 
         const found_message = await messageService.getMessage({ _id: message_id });
         if (!found_message) throw new NotFoundException("message not Found!");
 
-        const partner_user = await userService.getUser({ _id: found_message.to_user_id });
-        if (!partner_user) throw new NotFoundException("partner user not found!");
+        const friend = await userService.getUser({ _id: found_message.to_user_id });
+        if (!friend) throw new NotFoundException("partner user not found!");
 
         const edited_message = await messageSocketController.editMessage(socket, body);
+        
+        socket.emit('patch-edited-message', edited_message);
+        return socket.to(friend.socket_id).emit('path-edited-message', edited_message);
+      } catch (error) {
+        return socketIOErrorHandler(error, socket);
+      }
+    })
 
-        socket.emit('patch-message-edited', edited_message);
-        return socket.to(partner_user._id).emit('path-message-edited', edited_message);
+    socket.on('delete-message', async function (body) {
+      try {
+        
       } catch (error) {
         console.error(error);
         return socketIOErrorHandler(error, socket);

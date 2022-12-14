@@ -85,8 +85,14 @@ export default class MessageController {
       if (!found_message) throw new NotFoundException("message is not found in database!");
       if (found_message.to_user_id != user._id && found_message.from_user_id != user._id || found_message.to_user_id == user._id) throw new ForbiddenError("You have not been granted access to this information!");
 
-      const updated_message = await this.messageService.patchMessage({ _id: id }, { message });
+      const updated_message = (await this.messageService.patchMessage({ _id: id }, { message }))._doc;
       if (!updated_message) throw new NotFoundException("message not found!");
+
+      updated_message.from_user = await this.userService.getUser({ _id: user._id });
+      updated_message.to_user = await this.userService.getUser({ _id: found_message.to_user_id }) 
+
+      updated_message.from_user_id = undefined;
+      updated_message.to_user_id = undefined;
 
       return res.send(JSON.stringify({
         ok: true,
