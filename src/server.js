@@ -22,8 +22,10 @@ import UserStatisticsSocketController from './socket-io/controllers/user.statist
 import MessageSocketController from './socket-io/controllers/message.js'
 import { socketIOErrorHandler } from './socket-io/middlewares/error.handler.js'
 import { socketBodyParser } from './socket-io/helpers/json.parser.js'
-import { NotFoundException } from './api/helpers/error.js'
+import { NotFoundException, UnAuthorizationError } from './api/helpers/error.js'
 import UserSocketController from './socket-io/controllers/user.js'
+import MessageService from './api/services/message.js'
+import UsersService from './api/services/user.js'
 
 
 async function bootstrap() {
@@ -65,6 +67,9 @@ async function bootstrap() {
   const userStatisticsSocketController = new UserStatisticsSocketController();
   const userSocketController = new UserSocketController();
   const messageSocketController = new MessageSocketController()
+  const messageService = new MessageService();
+  const userService = new UsersService();
+
 
   io.on('connection', async function (socket) {
     const data = await userStatisticsSocketController.userConnected(socket)
@@ -99,22 +104,6 @@ async function bootstrap() {
         return socketIOErrorHandler(error, socket)
       }
     })
-
-    socket.on('register', async function (body) {
-      try {
-        // coming soon ...
-      } catch (error) {
-        return socketIOErrorHandler(error, socket)
-      }
-    })
-
-    socket.on('login', async function () {
-      try {
-        // coming soon ...
-      } catch (error) {
-        return socketIOErrorHandler(error, socket)
-      }
-    })
   })
 
   io.of('/messages').use(socketValidateRequest)
@@ -124,8 +113,8 @@ async function bootstrap() {
       try {
         const { user } = socket;
         const { to_user_id, message } = body;
-
-        if (!(user && to_user_id && message)) throw new NotFoundException('to_user_id and message is require!');
+        if (!user) throw new UnAuthorizationError("user not found!");
+        if (!(to_user_id && message)) throw new NotFoundException('to_user_id and message is require!');
 
         const { data: found_user } = await userSocketController.getUser(to_user_id);
         if (!found_user) throw new NotFoundException('user is "to_user_id" not found!');
@@ -135,41 +124,35 @@ async function bootstrap() {
         socket.emit('get-new-text-message', new_message);
         return socket.to(found_user?.socket_id).emit('get-new-text-message', new_message);
       } catch (error) {
-        return socketIOErrorHandler(error, socket)
+        return socketIOErrorHandler(error, socket);
+      }
+    })
+
+    socket.on('patch-edit-message', async function (body) {
+      try {
+        const { user } = socket;
+        const { message_id } = body;
+        if (!user) throw new UnAuthorizationError("user not found!");  
+        if (!message_id) throw new NotFoundException("message_id is not defined!");
+
+        const found_message = await messageService.getMessage({ _id: message_id });
+        if (!found_message) throw new NotFoundException("message not Found!");
+
+        const partner_user = await userService.getUser({ _id: found_message.to_user_id });
+        if (!partner_user) throw new NotFoundException("partner user not found!");
+
+        const edited_message = await messageSocketController.editMessage(socket, body);
+
+        socket.emit('patch-message-edited', edited_message);
+        return socket.to(partner_user._id).emit('path-message-edited', edited_message);
+      } catch (error) {
+        console.error(error);
+        return socketIOErrorHandler(error, socket);
       }
     })
   })
 
-  // io.use(socketValidateRequest)
-  // io.on('connection', async socket => {
-
-  //   console.log(socket.request.headers['user-agent']);
-  //   // return 0;
-
-  //   const userStatisticsSocketController = new UserStatisticsSocketController()
-  //   socket.emit("connected", await userStatisticsSocketController.userConnected(socket));
-
-  //   socket.use((event, next) => {
-
-  //     // console.log(event[0]);
-  //     // console.log(event[1]);
-  //     // console.log(JSON.parse(event[1]));
-  //     // console.log(typeof(JSON.parse(event[1])));
-  //     next();
-  //   });
-
-  //   socket.on("message", (data) => {
-  //     console.log("message", data);
-  //     // return socket.emit("keldi", data);
-  //   })
-
-  //   socket.on("disconnect", () => {
-  //     console.log("disconnect -->")
-  //   })
-  // })
-
-  // --------------------------------------------------------------------------------------------------
-
+ 
   app.use(errorHandler)
   server.listen(PORT, () => {
     console.log(`🚀 server running on ${serverConfig.url()}`)

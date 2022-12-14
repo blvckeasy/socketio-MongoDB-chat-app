@@ -7,12 +7,13 @@ import UsersService from '../services/user.js'
 import MessageService from '../services/message.js'
 import { admin } from '../../../config.js'
 
+
 export default class MessageController {
   constructor(MessageRepository, UserRepository) {
     this.Message = MessageRepository
     this.User = UserRepository
     this.messageService = new MessageService();
-    this.usersService = new UsersService(); 
+    this.userService = new UsersService(); 
   }
 
   async deleteUndefinedFromObject(filter) {
@@ -23,8 +24,8 @@ export default class MessageController {
   async getMessages(req, res, next) {
     try {
       const { to_user_id, from_user_id, id } = req.query
-      const found_sms_sended_user = await this.usersService.getUser({ _id: to_user_id });
-      const found_sms_recipient_user = await this.usersService.getUser({ _id: from_user_id });
+      const found_sms_sended_user = await this.userService.getUser({ _id: to_user_id });
+      const found_sms_recipient_user = await this.userService.getUser({ _id: from_user_id });
 
       if (found_sms_sended_user && found_sms_recipient_user) throw new NotFoundException("users not found!");
 
@@ -49,7 +50,7 @@ export default class MessageController {
       if (!user) throw new UnAuthorizationError("user is require!");
       if (!(user._id && to_user_id && message)) throw new NotFoundException("Insufficient data found in req body");
   
-      const select_users = await this.usersService.getUsers({
+      const select_users = await this.userService.getUsers({
         $or: [{ _id: user._id }, { _id: to_user_id }],
       }) || []
 
@@ -61,11 +62,15 @@ export default class MessageController {
         to_user_id,
         message,
       });
+      const found_user = await this.userService.getUser({ _id: to_user_id });
   
       return res.send(JSON.stringify({
         status: 201,
         message: 'Message successfully created.',
-        data: newMessage,
+        data: {
+          user: found_user,
+          message: newMessage,
+        },
       })).status(201)
     } catch (error) {
       next(error);

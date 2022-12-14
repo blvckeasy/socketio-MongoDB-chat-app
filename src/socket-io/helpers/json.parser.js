@@ -6,9 +6,17 @@ export function socketBodyParser(event, next) {
       return next();
     }
 
-    event[1] = JSON.parse(event[1]);
-    next();
+    if (typeof event[1] === "string") {
+      event[1] = JSON.parse(event[1]);
+      next();
+    }
+
+    throw new InvalidDataException("Invalid data!");
   } catch (error) {
-    throw new InvalidDataException("The body must be in JSON format");
+    if (error instanceof InvalidDataException) {
+      throw new InvalidDataException(error);
+    } else {
+      throw new InvalidDataException("The body must be in JSON format");
+    }
   }
 }

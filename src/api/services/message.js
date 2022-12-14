@@ -6,9 +6,18 @@ export default class MessageService {
     this.MessageRepository = Message;
   }
 
+  async getMessage(filter) {
+    try {
+      const message = await this.MessageRepository.findOne(filter);
+      return message;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getMessages(filter) {
     try {
-      let messages = await this.MessageRepository.find(filter);
+      const messages = await this.MessageRepository.find(filter);
       return messages;
     } catch (error) {
       throw error;
