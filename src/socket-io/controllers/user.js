@@ -1,6 +1,8 @@
 import fetch from "node-fetch";
 import { server } from "../../../config.js"
 import { InternalServerError, NotFoundException } from "../../api/helpers/error.js"
+import * as CustomeErrors from '../../api/helpers/error.js';
+
 
 export default class UserSocketController {
   #apiURL;
@@ -10,15 +12,21 @@ export default class UserSocketController {
   }
 
   async getUsers() {
-    const users = await fetch(this.#apiURL + "/users");
-    return await users.json();
+    let response = await fetch(this.#apiURL + "/users");
+    response = await response.json();
+    
+    if (!response.ok) throw new CustomeErrors[response.error?.name](response.error.message);
+    return response;
   }
 
   async getUser(id) {
     if (!id) throw new NotFoundException("id is require!");
     
-    const user = await fetch(this.#apiURL + "/users/" + id);
-    return await user.json();
+    let response = await fetch(this.#apiURL + "/users/" + id);
+    response = await response.json();
+
+    if (!response.ok) throw new CustomeErrors[response.error?.name](response.error.message);
+    return response;
   }
 
   async updateUserSocketID(socket) {
@@ -27,7 +35,7 @@ export default class UserSocketController {
     const { token } = socket;
     if (!token) throw new NotFoundException("token not found!");
     
-    const response = await fetch(this.#apiURL + "/users/update/socketID", {
+    let response = await fetch(this.#apiURL + "/users/update/socketID", {
       method: "PATCH",
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -37,8 +45,10 @@ export default class UserSocketController {
       body: JSON.stringify({
         socketID: socket.id,
       })
-    })
-    
-    return await response.json();
+    });    
+    response = await response.json();
+
+    if (!response.ok) throw new CustomeErrors[response.error?.name](response.error.message);
+    return response;
   }
 }

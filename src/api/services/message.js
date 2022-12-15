@@ -1,5 +1,4 @@
 import Message from "../database/models/message.js";
-import { UnAuthorizationError } from "../helpers/error.js"
 
 export default class MessageService {
   constructor () {

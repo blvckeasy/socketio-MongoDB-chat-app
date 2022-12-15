@@ -29,7 +29,10 @@ export default class UserStatisticsController {
         .send(
           JSON.stringify({
             ok: true,
-            data: statistics,
+            data: {
+              user: found_user,
+              statistics
+            },
           })
         )
         .status(200)

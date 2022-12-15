@@ -3,7 +3,8 @@ import UsersService from '../../api/services/user.js'
 import { verifyToken } from '../../api/helpers/jwt.js'
 import UserSocketController from '../controllers/user.js'
 
-const userService = new UsersService()
+const userService = new UsersService();
+
 
 export async function socketValidateRequest(socket, next) {
   try {

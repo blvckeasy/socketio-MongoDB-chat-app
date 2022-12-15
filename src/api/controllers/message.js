@@ -23,7 +23,8 @@ export default class MessageController {
 
   async getMessages(req, res, next) {
     try {
-      const { to_user_id, from_user_id, id } = req.query
+      const { to_user_id, from_user_id, id } = req.query;
+      
       const found_sms_sended_user = await this.userService.getUser({ _id: to_user_id });
       const found_sms_recipient_user = await this.userService.getUser({ _id: from_user_id });
 
@@ -80,6 +81,8 @@ export default class MessageController {
   async editMessage(req, res, next) {
     try {
       const { body: { message }, params: { id }, user } = req;
+
+      if (!(id && message)) throw new NotFoundException("id and message is require!");
 
       const found_message = (await this.messageService.getUserMessages({ _id: id }))[0];
       if (!found_message) throw new NotFoundException("message is not found in database!");

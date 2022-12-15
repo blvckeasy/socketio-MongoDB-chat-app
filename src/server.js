@@ -131,18 +131,18 @@ async function bootstrap() {
       try {
         const { user } = socket;
         const { message_id, message } = body;
-        if (!(message_id && message)) throw new NotFoundException("message_id or message is require!");
+        // if (!(message_id && message)) throw new NotFoundException("message_id or message is require!");
 
-        const found_message = await messageService.getMessage({ _id: message_id });
-        if (!found_message) throw new NotFoundException("message not Found!");
+        // const found_message = await messageService.getMessage({ _id: message_id });
+        // if (!found_message) throw new NotFoundException("message not Found!");
 
-        const friend = await userService.getUser({ _id: found_message.to_user_id });
-        if (!friend) throw new NotFoundException("partner user not found!");
+        // const friend = await userService.getUser({ _id: found_message.to_user_id });
+        // if (!friend) throw new NotFoundException("partner user not found!");
 
         const edited_message = await messageSocketController.editMessage(socket, body);
         
         socket.emit('patch-edited-message', edited_message);
-        return socket.to(friend.socket_id).emit('path-edited-message', edited_message);
+        // return socket.to(friend.socket_id).emit('path-edited-message', edited_message);
       } catch (error) {
         return socketIOErrorHandler(error, socket);
       }
@@ -152,12 +152,13 @@ async function bootstrap() {
       try {
         const { user } = socket;
         const { message_id } = body;
-
         if (!message_id) throw new NotFoundException("message_id is require!");        
-
+        
         const deleted_message = await messageSocketController.deleteMessage(socket, body);
+        const friend = deleted_message.data.to_user;
 
         socket.emit('delete-deleted-message', deleted_message);
+        return socket.to(friend.socket_id).emit('delete-deleted-message', deleted_message)
       } catch (error) {
         console.error(error);
         return socketIOErrorHandler(error, socket);
@@ -165,7 +166,8 @@ async function bootstrap() {
     })
   })
 
- 
+  
+
   app.use(errorHandler)
   server.listen(PORT, () => {
     console.log(`🚀 server running on ${serverConfig.url()}`)

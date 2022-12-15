@@ -1,5 +1,7 @@
 import fetch from "node-fetch";
 import { server } from "../../../config.js";
+import * as CustomeErrors from '../../api/helpers/error.js';
+
 
 export default class UserStatisticsSocketController {
   #apiURL;
@@ -11,7 +13,7 @@ export default class UserStatisticsSocketController {
   async userConnected (socket) {
     const { token } = socket;
 
-    const response = await fetch(this.#apiURL + "/userStatistics/connect", {
+    let response = await fetch(this.#apiURL + "/userStatistics/connect", {
       method: "POST",
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -21,22 +23,26 @@ export default class UserStatisticsSocketController {
       body: JSON.stringify({
         socketId: socket.id,
       })
-    })
-
-    return await response.json();
+    });
+    response = await response.json();
+    
+    if (!response.ok) throw new CustomeErrors[response.error?.name](response.error.message);
+    return response;
   }
 
   async userDisconnected (socket) {
     const { token } = socket;
-    const response = await fetch(this.#apiURL + "/userStatistics/disconnect", {
+    let response = await fetch(this.#apiURL + "/userStatistics/disconnect", {
       method: "POST",
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'user-agent': socket.request.headers['user-agent'],
       },
-    })
-
-    return await response.json();
+    });
+    response = await response.json();
+    
+    if (!response.ok) throw new CustomeErrors[response.error?.name](response.error.message);
+    return response;
   }
 }

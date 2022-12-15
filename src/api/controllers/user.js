@@ -57,7 +57,7 @@ export default class UsersController {
       }
 
     } catch (error) {
-      throw error;
+      next(error);
     }
   }
 
