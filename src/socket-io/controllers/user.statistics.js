@@ -13,11 +13,10 @@ export default class UserStatisticsSocketController {
   async userConnected() {
     try {
       const data = await this.userStatisticsSocketService.userConnected(this.socket); 
-      console.log('data:', data)
       this.socket.emit('connected', data);
       return this.socket.broadcast.emit('user-connected', data);
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return socketIOErrorHandler(error, this.socket);
     }
   }
@@ -25,7 +24,7 @@ export default class UserStatisticsSocketController {
   async userDisconnected() {
     try {
       const disconnect_user = await this.userStatisticsSocketService.userDisconnected(this.socket);
-      return this.socket.broadcast.emit('user-disconneted', disconnect_user);
+      return this.socket.broadcast.emit('user-disconnected', disconnect_user);
     } catch (error) {
       console.error(error);
       return socketIOErrorHandler(error, this.socket);

@@ -104,8 +104,6 @@ export default class UserStatisticsController {
           $and: [{ user_id: user._id }, { Exit_time: null }],
         })
       
-      console.log("found_statistics:", found_statistic)
-
       if (!found_statistic.length) throw new NotFoundException('The user is not online!')
 
       // update user status from offline
