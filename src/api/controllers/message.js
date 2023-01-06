@@ -88,11 +88,12 @@ export default class MessageController {
       if (!found_message) throw new NotFoundException("message is not found in database!");
       if (found_message.to_user_id != user._id && found_message.from_user_id != user._id || found_message.to_user_id == user._id) throw new ForbiddenError("You have not been granted access to this information!");
 
+      const from_user = await this.userService.getUser({ _id: user._id });
+      const to_user = await this.userService.getUser({ _id: found_message.to_user_id });
+      if (!(from_user && to_user)) throw new UnAuthorizationError("One of the users was not found!");
+
       const updated_message = (await this.messageService.patchMessage({ _id: id }, { message }))._doc;
       if (!updated_message) throw new NotFoundException("message not found!");
-
-      const from_user = await this.userService.getUser({ _id: user._id });
-      const to_user = await this.userService.getUser({ _id: found_message.to_user_id }) 
 
       return res.send(JSON.stringify({
         ok: true,
@@ -116,12 +117,13 @@ export default class MessageController {
       const found_message = (await this.messageService.getMessages({ _id: id }))[0];
       if (!found_message) throw new NotFoundException("message is not found in database!");
       if (found_message.to_user_id != user._id && found_message.from_user_id != user._id) throw new ForbiddenError("You have not been granted access to this information!");
+      
+      const from_user = await this.userService.getUser({ _id: user._id });
+      const to_user = await this.userService.getUser({ _id: found_message.to_user_id });
+      if (!(from_user && to_user)) throw new UnAuthorizationError("One of the users was not found!");
 
       const deleted_message = await this.messageService.deleteMessage({ _id: id });
       if (!deleted_message) throw new NotFoundException("message is not defined!");
-
-      const from_user = await this.userService.getUser({ _id: user._id });
-      const to_user = await this.userService.getUser({ _id: found_message.to_user_id });
 
       return res.send(JSON.stringify({
         ok: true,
@@ -150,6 +152,10 @@ export default class MessageController {
         ]
       });
       if (!found_messages) throw new NotFoundException("chat not found!");
+      
+      const from_user = await this.userService.getUser({ _id: user._id });
+      const to_user = await this.userService.getUser({ _id: found_messages[0].to_user_id });
+      if (!(from_user && to_user)) throw new UnAuthorizationError("One of the users was not found");
 
       const delete_messages = await this.messageService.deleteChat({
         $or: [
@@ -157,9 +163,6 @@ export default class MessageController {
           { from_user_id: user_id, to_user_id: user._id },
         ]        
       });
-
-      const from_user = await this.userService.getUser({ _id: user._id });
-      const to_user = await this.userService.getUser({ _id: found_messages[0].to_user_id });
 
       return res.send(JSON.stringify({
         ok: true,

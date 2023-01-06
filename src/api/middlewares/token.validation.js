@@ -8,8 +8,8 @@ export async function tokenValidation(req, res, next) {
 
     const user = verifyToken(token);
     const userAgent = req.headers['user-agent'];
-
-    if (user["user-agent"] !== userAgent) throw new ForbiddenError("invalid token");
+    
+    // if (user["user-agent"] !== userAgent) throw new ForbiddenError("invalid token");
 
     user.iat = undefined;
     user.exp = undefined;

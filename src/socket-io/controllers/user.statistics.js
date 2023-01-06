@@ -1,48 +1,34 @@
-import fetch from "node-fetch";
-import { server } from "../../../config.js";
-import * as CustomeErrors from '../../api/helpers/error.js';
+import UserStatisticsSocketService from "../services/user.statistics.js";
+import { socketIOErrorHandler } from "../middlewares/error.handler.js"
 
 
 export default class UserStatisticsSocketController {
-  #apiURL;
+  
 
-  constructor () {
-    this.#apiURL = server.url();
+  constructor (socket) {
+    this.userStatisticsSocketService = new UserStatisticsSocketService(socket);
+    this.socket = socket;
   }
 
-  async userConnected (socket) {
-    const { token } = socket;
-
-    let response = await fetch(this.#apiURL + "/userStatistics/connect", {
-      method: "POST",
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'User-Agent': socket.request.headers['user-agent'],
-      },
-      body: JSON.stringify({
-        socketId: socket.id,
-      })
-    });
-    response = await response.json();
-    
-    if (!response.ok) throw new CustomeErrors[response.error?.name](response.error.message);
-    return response;
+  async userConnected() {
+    try {
+      const data = await this.userStatisticsSocketService.userConnected(this.socket); 
+      console.log('data:', data)
+      this.socket.emit('connected', data);
+      return this.socket.broadcast.emit('user-connected', data);
+    } catch (error) {
+      console.error(error);
+      return socketIOErrorHandler(error, this.socket);
+    }
   }
 
-  async userDisconnected (socket) {
-    const { token } = socket;
-    let response = await fetch(this.#apiURL + "/userStatistics/disconnect", {
-      method: "POST",
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'user-agent': socket.request.headers['user-agent'],
-      },
-    });
-    response = await response.json();
-    
-    if (!response.ok) throw new CustomeErrors[response.error?.name](response.error.message);
-    return response;
+  async userDisconnected() {
+    try {
+      const disconnect_user = await this.userStatisticsSocketService.userDisconnected(this.socket);
+      return this.socket.broadcast.emit('user-disconneted', disconnect_user);
+    } catch (error) {
+      console.error(error);
+      return socketIOErrorHandler(error, this.socket);
+    }
   }
 }

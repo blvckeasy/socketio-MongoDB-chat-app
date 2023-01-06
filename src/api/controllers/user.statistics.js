@@ -55,8 +55,7 @@ export default class UserStatisticsController {
       if (!found_user) throw new UnAuthorizationError('user not found!')
 
       // get all incomplete statistics
-      const incomplete_statistics =
-        await this.usersStatisticsService.getUserStatistics({ Exit_time: null })
+      const incomplete_statistics = await this.usersStatisticsService.getUserStatistics({ user_id: user._id, Exit_time: null })
 
       if (incomplete_statistics) {
         const USER_STATISTICS_SERVICE = this.usersStatisticsService
@@ -101,12 +100,13 @@ export default class UserStatisticsController {
       const found_user = await this.usersService.getUsers({ _id: user._id })
       if (!found_user) throw new UnAuthorizationError('user not found!')
 
-      const found_statistic =
-        await this.usersStatisticsService.getUserStatistics({
+      const found_statistic = await this.usersStatisticsService.getUserStatistics({
           $and: [{ user_id: user._id }, { Exit_time: null }],
         })
-      if (!found_statistic.length)
-        throw new NotFoundException('The user is not online!')
+      
+      console.log("found_statistics:", found_statistic)
+
+      if (!found_statistic.length) throw new NotFoundException('The user is not online!')
 
       // update user status from offline
       await this.usersStatisticsService.patchUserStatistics(
@@ -128,7 +128,7 @@ export default class UserStatisticsController {
           user,
           statistic: user_last_statistics,
         },
-      })).status(200)
+      })).status(200) 
     } catch (error) {
       next(error)
     }

@@ -30,7 +30,9 @@ export const database = {
 
 export const logger = {
   type: 'combined',
-  accessLogStream: Fs.createWriteStream(Path.join(process.cwd(), 'src', 'api', 'logs', 'requests', `${getCurrentDate()}.log`), { flags: "a" })
+  options: {
+    stream: Fs.createWriteStream(Path.join(process.cwd(), 'src', 'api', 'logs', 'requests', `${getCurrentDate()}.log`), { flags: "a" }),
+  }
 }
 
 export const pagination = {

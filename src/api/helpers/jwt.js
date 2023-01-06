@@ -7,6 +7,7 @@ export function signToken (payload) {
     payload = JSON.parse(JSON.stringify(payload));
     return JWT.sign(payload, jwt_config.secretOrPrivateKey, { expiresIn: jwt_config.options.expiresIn })
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }
