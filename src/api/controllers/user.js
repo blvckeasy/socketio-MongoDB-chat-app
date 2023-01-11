@@ -1,5 +1,5 @@
 import Path from 'path';
-import { BadGatewayError, NotFoundException, UnAuthorizationError, ForbiddenError } from "../helpers/error.js";
+import { BadGatewayError, NotFoundException, UnAuthorizationError, ForbiddenError, InvalidDataException } from "../helpers/error.js";
 import UsersService from '../services/user.js';
 import { signToken } from '../helpers/jwt.js'
 import { admin } from '../../../config.js'
@@ -69,8 +69,9 @@ export default class UsersController {
       const found_user = await this.userService.getUser({ username });
       if (!found_user) throw new UnAuthorizationError("user not registered!");
 
-      const user = { ...(await this.userService.login(username, password))._doc };
-      if (!user) throw new UnAuthorizationError("The invalid password.");
+      const user = { ...(await this.userService.login(username, password))?._doc };
+      
+      if (!user._id) throw new UnAuthorizationError("The invalid password.");
       user["user-agent"] = req.headers["user-agent"];
       
       const token = signToken(user);
@@ -91,8 +92,11 @@ export default class UsersController {
   async register(req, res, next) {
     try {
       const { body: { username, password }, file } = req;
-      if (!(username && password)) return res.send(new UnAuthorizationError("username and password is require!"));
-  
+
+      if (!(username && password)) throw new UnAuthorizationError("username and password is require!");
+      if ((/\s/g.test(username))) throw new InvalidDataException("username: Space cannot be in username!");
+      if (password.trim().length != password.length) throw new InvalidDataException("username: Password must not start or end with a space!");
+
       const found_user = await this.userService.getUser({ username });
       if (found_user) throw new UnAuthorizationError("user already signin!");
       let filename;

@@ -5,6 +5,7 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUI from 'swagger-ui-express'
+import Cors from 'cors'
 
 import { mongooseConnect } from './api/database/mongoose.js'
 import userRoutes from './api/routes/user.js'
@@ -12,7 +13,7 @@ import messageRoutes from './api/routes/message.js'
 import userStatistics from './api/routes/user.statistics.js'
 import { errorHandler } from './api/middlewares/error.handler.js'
 import { socketValidateRequest } from './socket-io/middlewares/validation.js'
-import { logger as loggerConfig, server as serverConfig, cors as corsConfig, swagger as swaggerOptions } from '../config.js'
+import { logger as loggerConfig, server as serverConfig, cors as corsConfig, swagger as swaggerOptions, cors } from '../config.js'
 import { UserSocketRoute } from './socket-io/routes/user.js';
 import { UserStatisticsSocketRoute } from './socket-io/routes/user.statistics.js';
 import { MessageSocketRoute } from './socket-io/routes/message.js';
@@ -29,6 +30,7 @@ async function bootstrap() {
   })
 
   const specs = swaggerJSDoc(swaggerOptions)
+  app.use(Cors(corsConfig))
   app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs))
 
   app.use(helmet())

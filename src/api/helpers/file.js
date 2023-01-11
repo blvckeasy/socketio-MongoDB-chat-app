@@ -1,7 +1,7 @@
 import Fs from 'fs/promises';
 import Path from 'path';
 import { getCurrentDate } from './date.js';
-import { ForbiddenError, InternalServerError, InvalidDataException } from './error.js'
+import { ForbiddenError, InternalServerError, InvalidFileUpload } from './error.js'
 import { generateRandomNumber } from './random.generate.js'
 
 export async function CreateOrAppendFile (path, data) {
@@ -66,7 +66,7 @@ export async function writeProfileImage(file, options) {
   if (!file) throw new InternalServerError("file is require!");
   const { buffer, originalname, mimetype } = file;
 
-  if (mimetype?.split('/')[0] != 'image') throw new InvalidDataException("Just upload a picture!")
+  if (mimetype?.split('/')[0] != 'image') throw new InvalidFileUpload("Just upload a picture!")
 
   const file_name = `${generateRandomNumber(16)}.${getFileExtension(originalname)}`;
   const path = Path.join(process.cwd(), "files", "profile-images", file_name);
