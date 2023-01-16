@@ -30,10 +30,13 @@ async function bootstrap() {
   })
 
   const specs = swaggerJSDoc(swaggerOptions)
+
   app.use(Cors(corsConfig))
   app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs))
 
-  app.use(helmet())
+  app.use(helmet({
+    crossOriginResourcePolicy: false
+  }))
   // logger
   app.use(morgan(loggerConfig.type, loggerConfig.options))
   app.use(Express.json())

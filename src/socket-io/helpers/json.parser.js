@@ -8,10 +8,11 @@ export function socketBodyParser(event, next) {
 
     if (typeof event[1] === "string") {
       event[1] = JSON.parse(event[1]);
-      return next();
+      return next()
     }
 
-    throw new InvalidDataException("Invalid data!");
+    return next()
+    // throw new InvalidDataException("Invalid data!");
   } catch (error) {
     if (error instanceof InvalidDataException) {
       throw new InvalidDataException(error);

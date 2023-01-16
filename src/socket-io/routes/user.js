@@ -6,6 +6,6 @@ export async function UserSocketRoute (socket) {
   if (!socket) throw new InternalServerError("Socket is not found!");
   const userSocketController = new UserSocketController(socket);
 
-  socket.use(socketBodyParser);
+  socket.use(socketBodyParser);  
   socket.on('get', (body) => userSocketController.GET(body));
 }

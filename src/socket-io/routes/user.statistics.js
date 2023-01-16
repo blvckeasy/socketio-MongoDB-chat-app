@@ -14,4 +14,5 @@ export async function UserStatisticsSocketRoute (socket) {
   
   socket.on('user-disconnected', async () => await userStatisticsSocketController.userDisconnected());
   socket.on('disconnect', async () => await userStatisticsSocketController.userDisconnected());
+
 }

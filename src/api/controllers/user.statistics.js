@@ -12,7 +12,7 @@ export default class UserStatisticsController {
 
   async getUserStatistics(req, res, next) {
     try {
-      const { user_id, start_time, end_time } = req.params
+      const { user_id, start_time, end_time } = req.query
       if (!user_id) throw new NotFoundException('user_id is require!')
 
       const found_user = await this.usersService.getUser({ _id: user_id })

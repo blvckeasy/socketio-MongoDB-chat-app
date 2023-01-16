@@ -14,7 +14,6 @@ export async function socketValidateRequest(socket, next) {
     const user = verifyToken(token);
     const userAgent = socket.request?.headers['user-agent'];
     if (!userAgent) throw new ForbiddenError('invalid user agent');
-
     
     const found_user = await userService.getUser({ _id: user._id });
     if (!found_user) throw new AuthenticationError('user is not defined!');
@@ -29,7 +28,7 @@ export async function socketValidateRequest(socket, next) {
     updatedUser.socket_id = socket.id;
     socket.user = updatedUser;
 
-    next();
+    return next();
   } catch (error) {
     socket.emit('error', error.message);
     next(error);

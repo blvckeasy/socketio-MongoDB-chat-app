@@ -43,13 +43,13 @@ export default class UsersController {
 
   async getProfileImage(req, res, next) {
     try {
-      const { userId, fileName } = req.params;
+      const { userId, fileName } = req.query
       if (!(userId || fileName)) throw new NotFoundException("userId or fileName is require!");
 
       if (userId) {
         const found_user = await this.userService.getUser({ _id: userId });
-        if (!found_user) throw new NotFoundException("user not found!");
-        
+        if (!found_user) throw new NotFoundException("1user not found!");
+  
         return res.sendFile(Path.join(process.cwd(), 'files', 'profile-images', found_user.profile_img));
       }
       if (fileName) {
